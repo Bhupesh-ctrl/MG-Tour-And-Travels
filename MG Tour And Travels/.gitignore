@@ -1,0 +1,26 @@
+# Build artifacts
+**/bin/
+**/obj/
+**/dist/
+**/out-tsc/
+**/.angular/
+
+# Dependency folders
+**/node_modules/
+
+# User-specific / IDE files
+**/.vs/
+**/.vscode/
+**/*.user
+**/*.suo
+**/*.userosscache
+**/*.sln.docstates
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Log files
+**/*.log
+backend/FleetManagement.API/Logs/
