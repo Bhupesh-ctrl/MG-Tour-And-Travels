@@ -96,7 +96,7 @@ import { forkJoin } from 'rxjs';
             </div>
             <div class="glass-card summary-card">
               <div class="stats-label">Net Cab Profit</div>
-              <h2 style="color: var(--accent);">{{ cabReportSummary.netProfit | currency }}</h2>
+              <h2 [style.color]="cabReportSummary.netProfit >= 0 ? 'var(--success)' : 'var(--danger)'">{{ cabReportSummary.netProfit | currency }}</h2>
             </div>
           </div>
 
@@ -204,7 +204,7 @@ import { forkJoin } from 'rxjs';
             </div>
             <div class="glass-card summary-card">
               <div class="stats-label">Average Claim Value</div>
-              <h2 style="color: #ffffff;">{{ expenseReportSummary.average | currency }}</h2>
+              <h2 style="color: var(--text-primary);">{{ expenseReportSummary.average | currency }}</h2>
             </div>
             <div class="glass-card summary-card">
               <div class="stats-label">Highest Single Claim</div>
@@ -218,10 +218,10 @@ import { forkJoin } from 'rxjs';
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
               <div *ngFor="let cat of expenseCategorySums | keyvalue" style="font-size: 0.85rem;">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
-                  <strong style="color: #dfddd9;">{{ getCategoryLabel(cat.key) }}</strong>
-                  <span style="color:#ffffff;">{{ cat.value | currency }} ({{ (cat.value / (expenseReportSummary.total || 1)) * 100 | number:'1.0-0' }}%)</span>
-                </div>
-                <div style="background: rgba(255,255,255,0.06); height: 6px; border-radius: 4px;">
+                   <strong style="color: var(--text-primary);">{{ getCategoryLabel(cat.key) }}</strong>
+                   <span style="color: var(--text-secondary);">{{ cat.value | currency }} ({{ (cat.value / (expenseReportSummary.total || 1)) * 100 | number:'1.0-0' }}%)</span>
+                 </div>
+                 <div style="background: rgba(197, 155, 39, 0.15); height: 6px; border-radius: 4px;">
                   <div [style.width.%]="(cat.value / (expenseReportSummary.total || 1)) * 100" style="background: var(--primary); height: 6px; border-radius: 4px;"></div>
                 </div>
               </div>
@@ -271,8 +271,8 @@ import { forkJoin } from 'rxjs';
               <h2 style="color: var(--primary);">{{ earningsReportSummary.total | currency }}</h2>
             </div>
             <div class="glass-card summary-card">
-              <div class="stats-label">Average Booking Fare</div>
-              <h2 style="color: #ffffff;">{{ earningsReportSummary.average | currency }}</h2>
+              <div class="stats-label">Average Trip Fare</div>
+              <h2 style="color: var(--text-primary);">{{ earningsReportSummary.average | currency }}</h2>
             </div>
             <div class="glass-card summary-card">
               <div class="stats-label">Highest Single Fare</div>
@@ -323,12 +323,12 @@ import { forkJoin } from 'rxjs';
               <h2 style="color: var(--danger);">{{ profitReportSummary.expenses | currency }}</h2>
             </div>
             <div class="glass-card summary-card">
-              <div class="stats-label">Net Profit Margin</div>
-              <h2 style="color: var(--accent);">{{ profitReportSummary.netProfit | currency }}</h2>
+              <div class="stats-label">Net profit</div>
+              <h2 [style.color]="profitReportSummary.netProfit >= 0 ? 'var(--success)' : 'var(--danger)'">{{ profitReportSummary.netProfit | currency }}</h2>
             </div>
             <div class="glass-card summary-card">
-              <div class="stats-label">Operating Yield Ratio</div>
-              <h2 style="color:#ffffff;">{{ profitReportSummary.margin | number:'1.1-1' }}%</h2>
+              <div class="stats-label">Profit Margin</div>
+              <h2 style="color: var(--primary);">{{ profitReportSummary.margin | number:'1.1-1' }}%</h2>
             </div>
           </div>
 
@@ -368,16 +368,16 @@ import { forkJoin } from 'rxjs';
               <h2 style="color: var(--primary);">{{ routeReportSummary.uniqueRoutes }} Routes</h2>
             </div>
             <div class="glass-card summary-card">
-              <div class="stats-label">Total Requested Runs</div>
-              <h2 style="color: #ffffff;">{{ routeReportSummary.totalRuns }} Runs</h2>
+              <div class="stats-label">Total Runs</div>
+              <h2 style="color: var(--text-primary);">{{ routeReportSummary.totalRuns }} Runs</h2>
             </div>
             <div class="glass-card summary-card">
               <div class="stats-label">Completed Shifts</div>
               <h2 style="color: var(--success);">{{ routeReportSummary.completedRuns }} Completed</h2>
             </div>
             <div class="glass-card summary-card">
-              <div class="stats-label">Average Completion rate</div>
-              <h2 style="color: var(--accent);">{{ routeReportSummary.completionRate | number:'1.1-1' }}%</h2>
+              <div class="stats-label">Completion Rate</div>
+              <h2 [style.color]="routeReportSummary.completionRate >= 80 ? 'var(--success)' : (routeReportSummary.completionRate >= 50 ? 'var(--primary)' : 'var(--danger)')">{{ routeReportSummary.completionRate | number:'1.1-1' }}%</h2>
             </div>
           </div>
 

@@ -79,7 +79,7 @@ import { forkJoin } from 'rxjs';
         <div class="glass-card stats-card" (click)="openProfitModal()">
           <div>
             <div class="stats-label">Net Profit</div>
-            <div class="stats-number" style="color: var(--accent);">{{ netProfitFiltered | currency }}</div>
+            <div class="stats-number" [style.color]="netProfitFiltered >= 0 ? 'var(--success)' : 'var(--danger)'">{{ netProfitFiltered | currency }}</div>
             <div class="drilldown-hint">🔍 View profitability math</div>
           </div>
           <div style="font-size: 2rem;">📈</div>
@@ -123,7 +123,7 @@ import { forkJoin } from 'rxjs';
         <div class="glass-card stats-card" (click)="openRoutesModal()">
           <div>
             <div class="stats-label">Route Completion Rate</div>
-            <div class="stats-number" style="color: var(--accent);">{{ routeCompletionRate | number:'1.0-0' }}%</div>
+            <div class="stats-number" [style.color]="routeCompletionRate >= 80 ? 'var(--success)' : (routeCompletionRate >= 50 ? 'var(--primary)' : 'var(--danger)')">{{ routeCompletionRate | number:'1.0-0' }}%</div>
             <div class="drilldown-hint">🔍 View route completion %</div>
           </div>
           <div style="font-size: 2rem;">✅</div>
@@ -154,10 +154,10 @@ import { forkJoin } from 'rxjs';
             <!-- 1. MONTHLY CASH FLOW SVG CHART -->
             <svg *ngIf="activeChartType === 'cashflow'" viewBox="0 0 500 200" style="width: 100%; height: 220px;">
               <!-- Grid lines -->
-              <line x1="40" y1="20" x2="480" y2="20" stroke="rgba(255,255,255,0.05)"></line>
-              <line x1="40" y1="70" x2="480" y2="70" stroke="rgba(255,255,255,0.05)"></line>
-              <line x1="40" y1="120" x2="480" y2="120" stroke="rgba(255,255,255,0.05)"></line>
-              <line x1="40" y1="170" x2="480" y2="170" stroke="rgba(255,255,255,0.2)"></line>
+              <line x1="40" y1="20" x2="480" y2="20" stroke="rgba(0,0,0,0.06)"></line>
+              <line x1="40" y1="70" x2="480" y2="70" stroke="rgba(0,0,0,0.06)"></line>
+              <line x1="40" y1="120" x2="480" y2="120" stroke="rgba(0,0,0,0.06)"></line>
+              <line x1="40" y1="170" x2="480" y2="170" stroke="rgba(0,0,0,0.15)"></line>
 
               <!-- Y-Axis labels -->
               <text x="30" y="24" fill="var(--text-muted)" font-size="8" text-anchor="end">{{ maxCashflowValue | currency:'INR':'symbol':'1.0-0' }}</text>
@@ -201,10 +201,10 @@ import { forkJoin } from 'rxjs';
             <!-- 2. DAILY EARNINGS LINE SVG CHART -->
             <svg *ngIf="activeChartType === 'daily'" viewBox="0 0 500 200" style="width: 100%; height: 220px;">
               <!-- Grid lines -->
-              <line x1="40" y1="20" x2="480" y2="20" stroke="rgba(255,255,255,0.05)"></line>
-              <line x1="40" y1="70" x2="480" y2="70" stroke="rgba(255,255,255,0.05)"></line>
-              <line x1="40" y1="120" x2="480" y2="120" stroke="rgba(255,255,255,0.05)"></line>
-              <line x1="40" y1="170" x2="480" y2="170" stroke="rgba(255,255,255,0.2)"></line>
+              <line x1="40" y1="20" x2="480" y2="20" stroke="rgba(0,0,0,0.06)"></line>
+              <line x1="40" y1="70" x2="480" y2="70" stroke="rgba(0,0,0,0.06)"></line>
+              <line x1="40" y1="120" x2="480" y2="120" stroke="rgba(0,0,0,0.06)"></line>
+              <line x1="40" y1="170" x2="480" y2="170" stroke="rgba(0,0,0,0.15)"></line>
 
               <!-- Y-Axis labels -->
               <text x="30" y="24" fill="var(--text-muted)" font-size="8" text-anchor="end">{{ maxDailyEarningsValue | currency:'INR':'symbol':'1.0-0' }}</text>
@@ -230,11 +230,11 @@ import { forkJoin } from 'rxjs';
             <!-- 3. MONTHLY EXPENSE BAR SVG CHART -->
             <svg *ngIf="activeChartType === 'expense'" viewBox="0 0 500 200" style="width: 100%; height: 220px;">
               <!-- Grid lines -->
-              <line x1="120" y1="20" x2="120" y2="170" stroke="rgba(255,255,255,0.2)"></line>
-              <line x1="210" y1="20" x2="210" y2="170" stroke="rgba(255,255,255,0.05)"></line>
-              <line x1="300" y1="20" x2="300" y2="170" stroke="rgba(255,255,255,0.05)"></line>
-              <line x1="390" y1="20" x2="390" y2="170" stroke="rgba(255,255,255,0.05)"></line>
-              <line x1="480" y1="20" x2="480" y2="170" stroke="rgba(255,255,255,0.05)"></line>
+              <line x1="120" y1="20" x2="120" y2="170" stroke="rgba(0,0,0,0.15)"></line>
+              <line x1="210" y1="20" x2="210" y2="170" stroke="rgba(0,0,0,0.06)"></line>
+              <line x1="300" y1="20" x2="300" y2="170" stroke="rgba(0,0,0,0.06)"></line>
+              <line x1="390" y1="20" x2="390" y2="170" stroke="rgba(0,0,0,0.06)"></line>
+              <line x1="480" y1="20" x2="480" y2="170" stroke="rgba(0,0,0,0.06)"></line>
 
               <!-- X-Axis label scale -->
               <text x="120" y="185" fill="var(--text-muted)" font-size="8" text-anchor="middle">₹0</text>
@@ -270,10 +270,10 @@ import { forkJoin } from 'rxjs';
               </defs>
 
               <!-- Grid lines -->
-              <line x1="40" y1="20" x2="480" y2="20" stroke="rgba(255,255,255,0.05)"></line>
-              <line x1="40" y1="70" x2="480" y2="70" stroke="rgba(255,255,255,0.05)"></line>
-              <line x1="40" y1="120" x2="480" y2="120" stroke="rgba(255,255,255,0.05)"></line>
-              <line x1="40" y1="170" x2="480" y2="170" stroke="rgba(255,255,255,0.2)"></line>
+              <line x1="40" y1="20" x2="480" y2="20" stroke="rgba(0,0,0,0.06)"></line>
+              <line x1="40" y1="70" x2="480" y2="70" stroke="rgba(0,0,0,0.06)"></line>
+              <line x1="40" y1="120" x2="480" y2="120" stroke="rgba(0,0,0,0.06)"></line>
+              <line x1="40" y1="170" x2="480" y2="170" stroke="rgba(0,0,0,0.15)"></line>
 
               <!-- Y-Axis labels -->
               <text x="30" y="24" fill="var(--text-muted)" font-size="8" text-anchor="end">{{ maxProfitValue | currency:'INR':'symbol':'1.0-0' }}</text>
@@ -299,11 +299,11 @@ import { forkJoin } from 'rxjs';
             <!-- 5. ROUTE COMPLETION SVG CHART -->
             <svg *ngIf="activeChartType === 'route'" viewBox="0 0 500 200" style="width: 100%; height: 220px;">
               <!-- Vertical grid lines -->
-              <line x1="120" y1="20" x2="120" y2="170" stroke="rgba(255,255,255,0.2)"></line>
-              <line x1="210" y1="20" x2="210" y2="170" stroke="rgba(255,255,255,0.05)"></line>
-              <line x1="300" y1="20" x2="300" y2="170" stroke="rgba(255,255,255,0.05)"></line>
-              <line x1="390" y1="20" x2="390" y2="170" stroke="rgba(255,255,255,0.05)"></line>
-              <line x1="480" y1="20" x2="480" y2="170" stroke="rgba(255,255,255,0.05)"></line>
+              <line x1="120" y1="20" x2="120" y2="170" stroke="rgba(0,0,0,0.15)"></line>
+              <line x1="210" y1="20" x2="210" y2="170" stroke="rgba(0,0,0,0.06)"></line>
+              <line x1="300" y1="20" x2="300" y2="170" stroke="rgba(0,0,0,0.06)"></line>
+              <line x1="390" y1="20" x2="390" y2="170" stroke="rgba(0,0,0,0.06)"></line>
+              <line x1="480" y1="20" x2="480" y2="170" stroke="rgba(0,0,0,0.06)"></line>
 
               <!-- X-Axis label scale -->
               <text x="120" y="185" fill="var(--text-muted)" font-size="8" text-anchor="middle">0%</text>
@@ -321,7 +321,7 @@ import { forkJoin } from 'rxjs';
                   [attr.y]="bar.y" 
                   width="360" 
                   height="12" 
-                  fill="rgba(255,255,255,0.05)" 
+                  fill="rgba(0,0,0,0.04)" 
                   rx="3"
                 ></rect>
                 <!-- Filled color bar -->
@@ -336,7 +336,7 @@ import { forkJoin } from 'rxjs';
                   <title>{{ bar.route }}: {{ bar.rate }}% completed ({{ bar.total }} runs)</title>
                 </rect>
                 <!-- Value -->
-                <text x="475" [attr.y]="bar.y + 9" fill="#ffffff" font-size="7" font-weight="800" text-anchor="end">{{ bar.rate }}%</text>
+                <text x="475" [attr.y]="bar.y + 9" fill="var(--bg-secondary)" font-size="7" font-weight="800" text-anchor="end">{{ bar.rate }}%</text>
               </g>
             </svg>
 
@@ -543,7 +543,7 @@ import { forkJoin } from 'rxjs';
                   <span style="font-weight: 600; color: #dfddd9;">{{ getCategoryName(cat.key) }}</span>
                   <span style="color: #ffffff;">{{ cat.value | currency }} ({{ (cat.value / (totalExpensesFiltered || 1)) * 100 | number:'1.0-0' }}%)</span>
                 </div>
-                <div style="background: rgba(255,255,255,0.06); height: 5px; border-radius: 4px;">
+                <div style="background: rgba(197, 155, 39, 0.15); height: 5px; border-radius: 4px;">
                   <div [style.width.%]="(cat.value / (totalExpensesFiltered || 1)) * 100" style="background: var(--primary); height: 5px; border-radius: 4px;"></div>
                 </div>
               </div>
@@ -1103,7 +1103,17 @@ export class AdminDashboardComponent implements OnInit {
         this.expensesList = res.expenses.data || res.expenses || [];
         this.revenueList = res.revenue.data || res.revenue || [];
         this.tripsList = res.trips.data?.items || res.trips.items || [];
-        this.targetsList = res.targets.data || res.targets || [];
+        const rawTargets = res.targets.data || res.targets || [];
+        this.targetsList = rawTargets.map((t: any) => {
+          const targetTrips = t.targetTrips !== undefined ? t.targetTrips : (t.targetValue !== undefined ? t.targetValue : 0);
+          const completedTrips = t.completedTrips !== undefined ? t.completedTrips : (t.currentValue !== undefined ? t.currentValue : 0);
+          return {
+            ...t,
+            targetTrips,
+            completedTrips,
+            month: t.month || (t.startDate ? new Date(t.startDate).toLocaleString('default', { month: 'long', year: 'numeric' }) : 'June 2026')
+          };
+        });
 
         // Seed with realistic demo dataset if db tables are bare
         this.generateMockData();
@@ -1202,8 +1212,15 @@ export class AdminDashboardComponent implements OnInit {
     // Target completion rate
     const driverNamesForCabs = new Set(this.filteredCabs.map((c: any) => c.assignedDriverName));
     const targetSubset = this.targetsList.filter((t: any) => cabFilter === 'all' || driverNamesForCabs.has(t.driverName));
-    const achievedTargets = targetSubset.filter((t: any) => t.status === 1).length;
-    this.monthlyTargetsCompletionRate = targetSubset.length > 0 ? Math.round((achievedTargets / targetSubset.length) * 100) : 80;
+    let totalTarget = 0;
+    let totalCompleted = 0;
+    targetSubset.forEach((t: any) => {
+      totalTarget += t.targetTrips || 0;
+      totalCompleted += t.completedTrips || 0;
+    });
+    this.monthlyTargetsCompletionRate = totalTarget > 0 
+      ? Math.min(100, Math.round((totalCompleted / totalTarget) * 100)) 
+      : (targetSubset.length > 0 ? 0 : 80);
 
     // Route completion rate
     const completedTripsCount = this.filteredTrips.filter((t: any) => t.status === 2).length;

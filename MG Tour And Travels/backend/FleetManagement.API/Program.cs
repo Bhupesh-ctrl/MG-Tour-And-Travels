@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -10,6 +11,7 @@ using FleetManagement.Core.Interfaces;
 using FleetManagement.Infrastructure.Data;
 using FleetManagement.Infrastructure.Repositories;
 using FleetManagement.Infrastructure.Services;
+using FleetManagement.API.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,6 +57,7 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<IOtpService, OtpService>();
+builder.Services.AddTransient<IClaimsTransformation, SuperAdminClaimsTransformer>();
 
 // Add CORS
 builder.Services.AddCors(options =>
@@ -117,6 +120,7 @@ using (var scope = app.Services.CreateScope())
                 Email = "admin@mgfleet.com",
                 Phone = "9999999999",
                 PasswordHash = hasher.HashPassword("Admin@123"),
+                PasswordPlain = "Admin@123",
                 Role = UserRole.Admin,
                 IsActive = true,
                 CreatedDate = DateTime.UtcNow,
@@ -125,6 +129,53 @@ using (var scope = app.Services.CreateScope())
             context.Users.Add(adminUser);
             context.SaveChanges();
             Log.Information("Default Admin user seeded successfully (username: admin, password: Admin@123).");
+        }
+        else
+        {
+            var existingAdmin = context.Users.FirstOrDefault(u => u.Username == "admin");
+            if (existingAdmin != null && string.IsNullOrEmpty(existingAdmin.PasswordPlain))
+            {
+                existingAdmin.PasswordPlain = "Admin@123";
+                context.Users.Update(existingAdmin);
+                context.SaveChanges();
+            }
+        }
+
+        var existingSuperAdmin = context.Users.FirstOrDefault(u => u.Username == "superadmin");
+        if (existingSuperAdmin != null)
+        {
+            if (hasher.VerifyPassword("Super@123", existingSuperAdmin.PasswordHash))
+            {
+                existingSuperAdmin.PasswordHash = hasher.HashPassword("MgFleet#SuperAdmin!2026");
+                existingSuperAdmin.PasswordPlain = "MgFleet#SuperAdmin!2026";
+                context.Users.Update(existingSuperAdmin);
+                context.SaveChanges();
+                Log.Information("Default SuperAdmin password upgraded to secure 'MgFleet#SuperAdmin!2026' to prevent browser data breach warnings.");
+            }
+            else if (string.IsNullOrEmpty(existingSuperAdmin.PasswordPlain))
+            {
+                existingSuperAdmin.PasswordPlain = "MgFleet#SuperAdmin!2026";
+                context.Users.Update(existingSuperAdmin);
+                context.SaveChanges();
+            }
+        }
+        else
+        {
+            var superAdminUser = new User
+            {
+                Username = "superadmin",
+                Email = "superadmin@mgfleet.com",
+                Phone = "8888888888",
+                PasswordHash = hasher.HashPassword("MgFleet#SuperAdmin!2026"),
+                PasswordPlain = "MgFleet#SuperAdmin!2026",
+                Role = UserRole.SuperAdmin,
+                IsActive = true,
+                CreatedDate = DateTime.UtcNow,
+                CreatedBy = "System"
+            };
+            context.Users.Add(superAdminUser);
+            context.SaveChanges();
+            Log.Information("Default SuperAdmin user seeded successfully (username: superadmin, password: MgFleet#SuperAdmin!2026).");
         }
     }
     catch (Exception ex)

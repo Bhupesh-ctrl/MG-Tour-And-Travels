@@ -189,4 +189,25 @@ export class ApiService {
   deleteDocument(id: number): Observable<any> {
     return this.http.delete<any>(`${this.baseUrl}/documents/${id}`);
   }
+
+  // Admins API
+  getAdmins(): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/admins?t=${new Date().getTime()}`);
+  }
+
+  getAdmin(id: number): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/admins/${id}`);
+  }
+
+  createAdmin(admin: any): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/admins`, admin);
+  }
+
+  updateAdmin(id: number, admin: any): Observable<any> {
+    return this.http.put<any>(`${this.baseUrl}/admins/${id}`, admin);
+  }
+
+  deleteAdmin(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.baseUrl}/admins/${id}`);
+  }
 }

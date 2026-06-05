@@ -3,7 +3,8 @@ namespace FleetManagement.Core.Enums
     public enum UserRole
     {
         Admin,
-        Driver
+        Driver,
+        SuperAdmin
     }
 
     public enum CabStatus

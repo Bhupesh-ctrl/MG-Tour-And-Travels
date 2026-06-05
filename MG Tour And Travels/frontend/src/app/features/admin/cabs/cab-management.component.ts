@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../../core/services/api.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-cab-management',
@@ -101,10 +102,12 @@ import { ApiService } from '../../../core/services/api.service';
                   {{ getStatusLabel(cab.status) }}
                 </span>
               </td>
-              <td style="text-align: right; display: flex; gap: 0.5rem; justify-content: flex-end;">
-                <button class="btn btn-secondary" style="padding: 0.4rem 0.75rem; font-size: 0.8rem;" (click)="openDocumentsModal(cab)">DOCUMENTS</button>
-                <button class="btn btn-secondary" style="padding: 0.4rem 0.75rem; font-size: 0.8rem;" (click)="openEditModal(cab)">EDIT</button>
-                <button class="btn btn-danger" style="padding: 0.4rem 0.75rem; font-size: 0.8rem;" (click)="deleteCab(cab.id)">DELETE</button>
+              <td style="text-align: right; vertical-align: middle;">
+                <div style="display: flex; gap: 0.5rem; justify-content: flex-end; align-items: center;">
+                  <button class="btn btn-secondary" style="padding: 0.4rem 0.75rem; font-size: 0.8rem;" (click)="openDocumentsModal(cab)">DOCUMENTS</button>
+                  <button class="btn btn-secondary" style="padding: 0.4rem 0.75rem; font-size: 0.8rem;" (click)="openEditModal(cab)">EDIT</button>
+                  <button class="btn btn-danger" style="padding: 0.4rem 0.75rem; font-size: 0.8rem;" (click)="deleteCab(cab.id)">DELETE</button>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -229,9 +232,11 @@ import { ApiService } from '../../../core/services/api.service';
                       📄 VIEW
                     </a>
                   </td>
-                  <td style="text-align: right; display: flex; gap: 0.25rem; justify-content: flex-end;">
-                    <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" (click)="editDocument(doc)">EDIT</button>
-                    <button class="btn btn-danger" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" (click)="deleteDocument(doc.id)">REMOVE</button>
+                  <td style="text-align: right; vertical-align: middle;">
+                    <div style="display: flex; gap: 0.25rem; justify-content: flex-end; align-items: center;">
+                      <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" (click)="editDocument(doc)">EDIT</button>
+                      <button class="btn btn-danger" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" (click)="deleteDocument(doc.id)">REMOVE</button>
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -272,7 +277,7 @@ import { ApiService } from '../../../core/services/api.service';
                   <button class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;" (click)="docFileInput.click()">
                     📷 {{ docForm.fileName ? 'REPLACE FILE' : 'SELECT FILE' }}
                   </button>
-                  <span *ngIf="docForm.fileName" style="font-size: 0.8rem; color: var(--accent); max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                  <span *ngIf="docForm.fileName" style="font-size: 0.8rem; color: var(--success); max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                     ✓ {{ docForm.fileName }}
                   </span>
                 </div>
@@ -346,7 +351,7 @@ export class CabManagementComponent implements OnInit {
     status: 0
   };
 
-  constructor(private apiService: ApiService) {}
+  constructor(private apiService: ApiService, private toast: ToastService) {}
 
   ngOnInit() {
     this.loadCabs();
@@ -474,6 +479,7 @@ export class CabManagementComponent implements OnInit {
           if (res.success) {
             this.closeModal();
             this.loadCabs();
+            this.toast.success('Cab details updated successfully.');
           } else {
             this.modalError = res.message || 'Failed to update cab.';
           }
@@ -488,6 +494,7 @@ export class CabManagementComponent implements OnInit {
           if (res.success) {
             this.closeModal();
             this.loadCabs();
+            this.toast.success('Cab registered successfully.');
           } else {
             this.modalError = res.message || 'Failed to register cab.';
           }
@@ -505,10 +512,11 @@ export class CabManagementComponent implements OnInit {
         next: (res) => {
           if (res.success) {
             this.loadCabs();
+            this.toast.success('Cab deleted successfully.');
           }
         },
         error: (err) => {
-          alert(err.error?.message || 'Error deleting cab.');
+          this.toast.error(err.error?.message || 'Error deleting cab.');
         }
       });
     }
@@ -596,6 +604,7 @@ export class CabManagementComponent implements OnInit {
             this.editingDocId = null;
             this.resetDocForm();
             this.loadDocuments();
+            this.toast.success('Document updated successfully.');
           } else {
             this.docModalError = res.message || 'Failed to update document.';
           }
@@ -625,6 +634,7 @@ export class CabManagementComponent implements OnInit {
           if (res.success) {
             this.resetDocForm();
             this.loadDocuments();
+            this.toast.success('Document uploaded successfully.');
           } else {
             this.docModalError = res.message || 'Failed to upload document.';
           }
@@ -658,10 +668,11 @@ export class CabManagementComponent implements OnInit {
         next: (res) => {
           if (res.success) {
             this.loadDocuments();
+            this.toast.success('Document removed.');
           }
         },
         error: (err) => {
-          alert(err.error?.message || 'Error deleting document.');
+          this.toast.error(err.error?.message || 'Error deleting document.');
         }
       });
     }

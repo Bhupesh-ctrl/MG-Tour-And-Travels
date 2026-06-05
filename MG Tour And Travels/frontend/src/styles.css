@@ -175,12 +175,11 @@ select.form-control {
   background-size: 1rem !important;
   padding-right: 2.5rem !important;
   cursor: pointer;
-  border: 1.5px solid var(--primary) !important;
+  border: 1px solid var(--border-color) !important;
 }
 
-select.form-control option {
-  background-color: #000000 !important;
-  color: #ffffff !important;
+select.form-control:focus {
+  border-color: var(--border-color-focus) !important;
 }
 
 /* Custom styling for select badge elements in tables */
@@ -364,6 +363,12 @@ select.badge-info {
   border-radius: 12px;
   border: 1px solid var(--border-color);
   background: var(--bg-secondary);
+  
+  /* Overrides for text color inside dark table panels to ensure contrast */
+  --text-primary: #ffffff;
+  --text-secondary: #c5c2b9;
+  --text-muted: #9e9a8f;
+  --accent: var(--primary);
 }
 
 .data-table {
@@ -459,6 +464,18 @@ select.badge-info {
   padding: 2rem;
   box-shadow: 0 20px 40px rgba(0,0,0,0.5);
   animation: modalSlideUp 0.3s ease-out;
+  
+  /* Overrides for text color inside dark modal dialogs to ensure contrast */
+  --text-primary: #ffffff;
+  --text-secondary: #c5c2b9;
+  --text-muted: #9e9a8f;
+  --accent: var(--primary);
+}
+
+.modal-content .glass-card {
+  background: rgba(0, 0, 0, 0.3) !important;
+  border: 1px solid rgba(197, 155, 39, 0.25) !important;
+  box-shadow: none !important;
 }
 
 @keyframes modalSlideUp {
@@ -530,6 +547,29 @@ select.badge-info {
 
 .modal-content select.form-control {
   background-color: #111111 !important;
+  color: #ffffff !important;
+}
+
+/* Invert calendar icon for date picker input controls in dark panels */
+.modal-content input[type="date"]::-webkit-calendar-picker-indicator,
+.table-container input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
+}
+
+/* Fix Chrome/Edge date input text visibility in dark panels */
+.modal-content input[type="date"]::-webkit-datetime-edit,
+.modal-content input[type="date"]::-webkit-datetime-edit-fields-wrapper,
+.modal-content input[type="date"]::-webkit-datetime-edit-text,
+.modal-content input[type="date"]::-webkit-datetime-edit-month-field,
+.modal-content input[type="date"]::-webkit-datetime-edit-day-field,
+.modal-content input[type="date"]::-webkit-datetime-edit-year-field,
+.table-container input[type="date"]::-webkit-datetime-edit,
+.table-container input[type="date"]::-webkit-datetime-edit-fields-wrapper,
+.table-container input[type="date"]::-webkit-datetime-edit-text,
+.table-container input[type="date"]::-webkit-datetime-edit-month-field,
+.table-container input[type="date"]::-webkit-datetime-edit-day-field,
+.table-container input[type="date"]::-webkit-datetime-edit-year-field {
   color: #ffffff !important;
 }
 

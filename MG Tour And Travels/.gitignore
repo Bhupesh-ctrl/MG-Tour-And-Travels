@@ -24,3 +24,10 @@ Thumbs.db
 # Log files
 **/*.log
 backend/FleetManagement.API/Logs/
+
+# Publish folders
+**/publish/
+
+# Uploads
+**/wwwroot/uploads/
+

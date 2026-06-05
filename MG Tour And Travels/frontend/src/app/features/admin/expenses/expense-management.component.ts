@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../../core/services/api.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-expense-management',
@@ -105,11 +106,13 @@ import { ApiService } from '../../../core/services/api.service';
                   {{ getStatusLabel(exp.status) }}
                 </span>
               </td>
-              <td style="text-align: right; display: flex; gap: 0.5rem; justify-content: flex-end; align-items: center;">
-                <button class="btn btn-secondary" style="padding: 0.4rem 0.75rem; font-size: 0.8rem;" (click)="openEditModal(exp)">EDIT</button>
-                <button *ngIf="exp.status === 0" class="btn btn-accent" style="padding: 0.4rem 0.75rem; font-size: 0.8rem;" (click)="updateStatus(exp.id, 'Approved')">APPROVE</button>
-                <button *ngIf="exp.status === 0" class="btn btn-danger" style="padding: 0.4rem 0.75rem; font-size: 0.8rem;" (click)="updateStatus(exp.id, 'Rejected')">REJECT</button>
-                <span *ngIf="exp.status !== 0" style="color: var(--text-muted); font-size: 0.85rem; padding: 0.4rem 0;">Reviewed</span>
+              <td style="text-align: right; vertical-align: middle;">
+                <div style="display: flex; gap: 0.5rem; justify-content: flex-end; align-items: center;">
+                  <button class="btn btn-secondary" style="padding: 0.4rem 0.75rem; font-size: 0.8rem;" (click)="openEditModal(exp)">EDIT</button>
+                  <button *ngIf="exp.status === 0" class="btn btn-accent" style="padding: 0.4rem 0.75rem; font-size: 0.8rem;" (click)="updateStatus(exp.id, 'Approved')">APPROVE</button>
+                  <button *ngIf="exp.status === 0" class="btn btn-danger" style="padding: 0.4rem 0.75rem; font-size: 0.8rem;" (click)="updateStatus(exp.id, 'Rejected')">REJECT</button>
+                  <span *ngIf="exp.status !== 0" style="color: var(--text-muted); font-size: 0.85rem; padding: 0.4rem 0;">Reviewed</span>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -197,7 +200,7 @@ import { ApiService } from '../../../core/services/api.service';
               <button class="btn btn-secondary" (click)="fileInput.click()">
                 📷 {{ expenseForm.receiptFileName ? 'REPLACE FILE' : 'UPLOAD RECEIPT' }}
               </button>
-              <span *ngIf="expenseForm.receiptFileName" style="font-size: 0.85rem; color: var(--accent); font-weight: 600; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-width: 180px;">
+              <span *ngIf="expenseForm.receiptFileName" style="font-size: 0.85rem; color: var(--success); font-weight: 600; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-width: 180px;">
                 ✓ {{ expenseForm.receiptFileName }}
               </span>
             </div>
@@ -254,7 +257,7 @@ export class ExpenseManagementComponent implements OnInit {
   totalCount = 0;
   totalPages = 1;
 
-  constructor(private apiService: ApiService) {}
+  constructor(private apiService: ApiService, private toast: ToastService) {}
 
   ngOnInit() {
     this.loadExpenses();
@@ -349,10 +352,11 @@ export class ExpenseManagementComponent implements OnInit {
       next: (res) => {
         if (res.success) {
           this.loadExpenses();
+          this.toast.success(`Expense claim ${status.toLowerCase()}.`);
         }
       },
       error: (err) => {
-        alert(err.error?.message || 'Error updating expense status.');
+        this.toast.error(err.error?.message || 'Error updating expense status.');
       }
     });
   }
@@ -461,6 +465,7 @@ export class ExpenseManagementComponent implements OnInit {
           if (res.success) {
             this.closeModal();
             this.loadExpenses();
+            this.toast.success('Expense claim updated successfully.');
           } else {
             this.modalError = res.message || 'Failed to update expense.';
           }
@@ -482,6 +487,7 @@ export class ExpenseManagementComponent implements OnInit {
           if (res.success) {
             this.closeModal();
             this.loadExpenses();
+            this.toast.success('Expense logged successfully.');
           } else {
             this.modalError = res.message || 'Failed to log expense.';
           }

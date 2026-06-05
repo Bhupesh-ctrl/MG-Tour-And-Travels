@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../../core/services/api.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-driver-expense',
@@ -15,9 +16,6 @@ import { AuthService } from '../../../core/services/auth.service';
       <div class="glass-card" style="margin-bottom: 2rem;">
         <h3 style="margin-bottom: 1.25rem;">New Reimbursement Request</h3>
         
-        <div *ngIf="successMsg" class="badge badge-success" style="width: 100%; padding: 0.75rem; border-radius: 8px; margin-bottom: 1.25rem; justify-content: center; text-transform: none; text-align: center;">
-          {{ successMsg }}
-        </div>
         <div *ngIf="errorMsg" class="badge badge-danger" style="width: 100%; padding: 0.75rem; border-radius: 8px; margin-bottom: 1.25rem; justify-content: center; text-transform: none; text-align: center;">
           {{ errorMsg }}
         </div>
@@ -51,7 +49,7 @@ import { AuthService } from '../../../core/services/auth.service';
             <button class="btn btn-secondary" (click)="fileInput.click()">
               📷 {{ expenseForm.receiptFileName ? 'REPLACE FILE' : 'TAKE PICTURE / UPLOAD' }}
             </button>
-            <span *ngIf="expenseForm.receiptFileName" style="font-size: 0.85rem; color: var(--accent); font-weight: 600;">
+            <span *ngIf="expenseForm.receiptFileName" style="font-size: 0.85rem; color: var(--success); font-weight: 600;">
               ✓ {{ expenseForm.receiptFileName }}
             </span>
           </div>
@@ -168,7 +166,7 @@ export class DriverExpenseComponent implements OnInit {
     receiptFileName: ''
   };
 
-  constructor(private apiService: ApiService, private authService: AuthService) {}
+  constructor(private apiService: ApiService, private authService: AuthService, private toast: ToastService) {}
 
   ngOnInit() {
     this.loadDriverExpenses();
@@ -283,9 +281,8 @@ export class DriverExpenseComponent implements OnInit {
     this.apiService.createExpense(payload).subscribe({
       next: (res) => {
         this.loading = false;
-        this.successMsg = 'Expense claim submitted successfully!';
+        this.toast.success('Expense claim submitted successfully!');
         this.loadDriverExpenses();
-        // reset form
         this.expenseForm = {
           category: 0,
           amount: 15,
@@ -296,7 +293,7 @@ export class DriverExpenseComponent implements OnInit {
       },
       error: (err) => {
         this.loading = false;
-        this.errorMsg = err.error?.message || 'Error submitting expense claim.';
+        this.toast.error(err.error?.message || 'Error submitting expense claim.');
       }
     });
   }

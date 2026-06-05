@@ -246,8 +246,8 @@ import { AuthService } from '../../../core/services/auth.service';
           </div>
 
           <div style="display: flex; align-items: center; gap: 0.5rem;">
-            <div style="flex-grow: 1; height: 6px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden; position: relative;">
-              <div [style.width.%]="getProgressPercent(tg.currentValue, tg.targetValue)" style="height: 100%; background: var(--accent); border-radius: 4px; transition: width 0.3s;"></div>
+            <div style="flex-grow: 1; height: 6px; background: rgba(197, 155, 39, 0.15); border-radius: 4px; overflow: hidden; position: relative;">
+              <div [style.width.%]="getProgressPercent(tg.currentValue, tg.targetValue)" style="height: 100%; background: var(--primary); border-radius: 4px; transition: width 0.3s;"></div>
             </div>
             <span style="font-size: 0.8rem; font-weight: 700;">{{ getProgressPercent(tg.currentValue, tg.targetValue) }}%</span>
           </div>
@@ -287,7 +287,7 @@ export class DriverDashboardComponent implements OnInit {
   } = {
     tripId: null,
     startLocation: '',
-    startOdometer: null,
+    startOdometer: 0,
     pickupOrDrop: 'Pickup',
     notes: ''
   };
@@ -298,7 +298,7 @@ export class DriverDashboardComponent implements OnInit {
     notes: string;
   } = {
     endLocation: '',
-    endOdometer: null,
+    endOdometer: 0,
     notes: ''
   };
 
@@ -315,8 +315,8 @@ export class DriverDashboardComponent implements OnInit {
     tripId: null,
     startLocation: '',
     endLocation: '',
-    startOdometer: null,
-    endOdometer: null,
+    startOdometer: 0,
+    endOdometer: 0,
     pickupOrDrop: 'Pickup',
     status: 'Completed',
     notes: ''
@@ -334,15 +334,6 @@ export class DriverDashboardComponent implements OnInit {
         if (res.success) {
           this.stats = res.data;
 
-          if (this.stats.currentCab) {
-            this.startTripForm.startOdometer = 12050; // Prefill fallback odometer
-            this.pastTripForm.startOdometer = 12050; // Prefill fallback start odometer
-            this.pastTripForm.endOdometer = 12065; // Prefill fallback end odometer
-          }
-
-          if (this.stats.activeTrip) {
-            this.endTripForm.endOdometer = this.stats.activeTrip.startOdometer + 15; // Prefill fallback end odometer
-          }
           
           // Load active targets for driver
           const driverId = this.authService.getDriverId();
@@ -399,7 +390,7 @@ export class DriverDashboardComponent implements OnInit {
         this.startTripForm = {
           tripId: null,
           startLocation: '',
-          startOdometer: null,
+          startOdometer: 0,
           pickupOrDrop: 'Pickup',
           notes: ''
         };
@@ -447,7 +438,7 @@ export class DriverDashboardComponent implements OnInit {
         this.loading = false;
         this.endTripForm = {
           endLocation: '',
-          endOdometer: null,
+          endOdometer: 0,
           notes: ''
         };
         this.loadDriverData();
@@ -515,8 +506,8 @@ export class DriverDashboardComponent implements OnInit {
           tripId: null,
           startLocation: '',
           endLocation: '',
-          startOdometer: null,
-          endOdometer: null,
+          startOdometer: 0,
+          endOdometer: 0,
           pickupOrDrop: 'Pickup',
           status: 'Completed',
           notes: ''
@@ -597,7 +588,7 @@ export class DriverDashboardComponent implements OnInit {
           this.loading = false;
           this.endTripForm = {
             endLocation: '',
-            endOdometer: null,
+            endOdometer: 0,
             notes: ''
           };
           this.loadDriverData();

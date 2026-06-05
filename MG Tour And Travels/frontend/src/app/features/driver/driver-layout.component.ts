@@ -25,6 +25,7 @@ import { AuthService } from '../../core/services/auth.service';
         <router-outlet></router-outlet>
       </main>
     </div>
+    <app-toast></app-toast>
   `,
   styles: [`
     .driver-app-container {
@@ -132,6 +133,6 @@ export class DriverLayoutComponent {
 
   logout() {
     this.authService.logout();
-    this.router.navigate(['/auth/login']);
+    this.router.navigate(['/auth/login'], { queryParams: { portal: 'driver' } });
   }
 }

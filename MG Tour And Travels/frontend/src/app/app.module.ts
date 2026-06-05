@@ -22,6 +22,7 @@ import { TripManagementComponent } from './features/admin/trips/trip-management.
 import { ExpenseManagementComponent } from './features/admin/expenses/expense-management.component';
 import { TargetManagementComponent } from './features/admin/targets/target-management.component';
 import { AuditTrailComponent } from './features/admin/audits/audit-trail.component';
+import { AdminManagementComponent } from './features/admin/admins/admin-management.component';
 
 import { DriverDashboardComponent } from './features/driver/dashboard/driver-dashboard.component';
 import { DriverTripComponent } from './features/driver/trips/driver-trip.component';
@@ -29,6 +30,7 @@ import { DriverExpenseComponent } from './features/driver/expenses/driver-expens
 import { HomeComponent } from './features/home/home.component';
 import { InquiriesComponent } from './features/admin/inquiries/inquiries.component';
 import { ReportsComponent } from './features/admin/reports/reports.component';
+import { ToastComponent } from './features/admin/toast/toast.component';
 
 @NgModule({
   declarations: [
@@ -48,7 +50,9 @@ import { ReportsComponent } from './features/admin/reports/reports.component';
     DriverExpenseComponent,
     HomeComponent,
     InquiriesComponent,
-    ReportsComponent
+    ReportsComponent,
+    ToastComponent,
+    AdminManagementComponent
   ],
   imports: [
     BrowserModule,

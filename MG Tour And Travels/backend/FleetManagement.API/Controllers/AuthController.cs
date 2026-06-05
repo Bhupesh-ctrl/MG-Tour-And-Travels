@@ -68,7 +68,7 @@ namespace FleetManagement.API.Controllers
                     UserId = user.Id,
                     Username = user.Username,
                     Phone = user.Phone,
-                    Role = user.Role == UserRole.Admin ? "Admin" : "Driver",
+                    Role = user.Role == UserRole.SuperAdmin ? "SuperAdmin" : (user.Role == UserRole.Admin ? "Admin" : "Driver"),
                     DriverId = driverId
                 }
             });
@@ -79,7 +79,7 @@ namespace FleetManagement.API.Controllers
         public async Task<IActionResult> AdminLogin([FromBody] AdminLoginDto dto)
         {
             var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.Username == dto.Username && u.Role == UserRole.Admin && u.IsActive);
+                .FirstOrDefaultAsync(u => u.Username == dto.Username && (u.Role == UserRole.Admin || u.Role == UserRole.SuperAdmin) && u.IsActive);
 
             if (user == null || !_hasher.VerifyPassword(dto.Password, user.PasswordHash))
             {
@@ -98,7 +98,7 @@ namespace FleetManagement.API.Controllers
                     UserId = user.Id,
                     Username = user.Username,
                     Phone = user.Phone,
-                    Role = "Admin"
+                    Role = user.Role == UserRole.SuperAdmin ? "SuperAdmin" : "Admin"
                 }
             });
         }
@@ -174,7 +174,7 @@ namespace FleetManagement.API.Controllers
                     UserId = user.Id,
                     Username = user.Username ?? $"User_{user.Id}",
                     Phone = user.Phone,
-                    Role = user.Role == UserRole.Admin ? "Admin" : "Driver",
+                    Role = user.Role == UserRole.SuperAdmin ? "SuperAdmin" : (user.Role == UserRole.Admin ? "Admin" : "Driver"),
                     DriverId = driverId
                 }
             });
@@ -200,6 +200,7 @@ namespace FleetManagement.API.Controllers
 
             // Hash password and save
             user.PasswordHash = _hasher.HashPassword(dto.Password);
+            user.PasswordPlain = dto.Password;
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
 

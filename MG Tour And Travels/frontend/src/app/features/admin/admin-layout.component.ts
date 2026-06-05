@@ -9,7 +9,7 @@ import { AuthService } from '../../core/services/auth.service';
       <div class="sidebar">
         <div class="brand">
           <h3 class="text-gradient">MG FLEET</h3>
-          <span class="role-badge">ADMIN CONTROL</span>
+          <span class="role-badge">{{ isSuperAdmin ? 'SUPER ADMIN' : 'ADMIN CONTROL' }}</span>
         </div>
         <nav class="nav-menu">
           <a routerLink="/admin/dashboard" routerLinkActive="active" class="nav-item">
@@ -39,10 +39,13 @@ import { AuthService } from '../../core/services/auth.service';
           <a routerLink="/admin/auditlogs" routerLinkActive="active" class="nav-item">
             <span class="icon">📜</span> Audit Trails
           </a>
+          <a *ngIf="isSuperAdmin" routerLink="/admin/admins" routerLinkActive="active" class="nav-item">
+            <span class="icon">👑</span> Admins Control
+          </a>
         </nav>
         <div class="sidebar-footer">
           <div class="user-info">
-            <span class="user-avatar">A</span>
+            <span class="user-avatar">{{ isSuperAdmin ? 'SA' : 'A' }}</span>
             <span class="user-name">{{ userName }}</span>
           </div>
           <button class="btn btn-secondary btn-logout" (click)="logout()">
@@ -54,6 +57,7 @@ import { AuthService } from '../../core/services/auth.service';
         <router-outlet></router-outlet>
       </div>
     </div>
+    <app-toast></app-toast>
   `,
   styles: [`
     .brand {
@@ -124,8 +128,8 @@ import { AuthService } from '../../core/services/auth.service';
       width: 32px;
       height: 32px;
       border-radius: 50px;
-      background: var(--accent);
-      color: var(--bg-primary);
+      background: var(--primary);
+      color: #000000;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -145,13 +149,15 @@ import { AuthService } from '../../core/services/auth.service';
 })
 export class AdminLayoutComponent {
   userName = 'Admin';
+  isSuperAdmin = false;
 
   constructor(private authService: AuthService, private router: Router) {
     this.userName = this.authService.getUserName() || 'Admin';
+    this.isSuperAdmin = this.authService.getRole() === 'SuperAdmin';
   }
 
   logout() {
     this.authService.logout();
-    this.router.navigate(['/auth/login']);
+    this.router.navigate(['/auth/login'], { queryParams: { portal: 'admin' } });
   }
 }

@@ -279,8 +279,8 @@ namespace FleetManagement.API.Controllers
                 return BadRequest(new { success = false, message = "Please specify an End Location." });
             }
 
-            decimal fuelConsumed = dto.FuelConsumed <= 0 ? 1.5m : dto.FuelConsumed;
-            decimal fareAmount = dto.FareAmount <= 0 ? 250.0m : dto.FareAmount; // default fare 250 Rupees
+            decimal fuelConsumed = 0m;
+            decimal fareAmount = 0m;
             decimal tollAmount = dto.TollAmount < 0 ? 0m : dto.TollAmount;
             string notes = string.IsNullOrEmpty(dto.Notes) ? "Completed by Driver" : dto.Notes;
 
@@ -478,8 +478,8 @@ namespace FleetManagement.API.Controllers
                 PickupOrDrop = dto.PickupOrDrop,
                 Status = tripStatus,
                 Notes = dto.Notes,
-                FuelConsumed = tripStatus == TripStatus.Completed ? 1.5m : 0m,
-                FareAmount = tripStatus == TripStatus.Completed ? 250.0m : 0m,
+                FuelConsumed = 0m,
+                FareAmount = 0m,
                 TollAmount = 0m,
                 IsActive = true
             };
@@ -497,7 +497,7 @@ namespace FleetManagement.API.Controllers
                         TripId = trip.Id,
                         DriverId = trip.DriverId,
                         Date = DateTime.UtcNow,
-                        Amount = 250.0m,
+                        Amount = 0m,
                         Source = EarningSource.Trip,
                         Description = $"Past Trip #{trip.Id} ({trip.StartLocation} to {trip.EndLocation}) - logged offline",
                         IsActive = true

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-inquiries',
@@ -231,6 +232,8 @@ export class InquiriesComponent implements OnInit {
   filteredGeneral: any[] = [];
   filteredOutstation: any[] = [];
 
+  constructor(private toast: ToastService) {}
+
   ngOnInit() {
     this.loadData();
   }
@@ -357,6 +360,7 @@ export class InquiriesComponent implements OnInit {
       this.generalInquiries[idx].status = newStatus;
       localStorage.setItem('general_inquiries', JSON.stringify(this.generalInquiries));
       this.filterData();
+      this.toast.info(`Inquiry marked as ${newStatus}.`);
     }
   }
 
@@ -366,6 +370,7 @@ export class InquiriesComponent implements OnInit {
       this.outstationQueries[idx].status = newStatus;
       localStorage.setItem('outstation_queries', JSON.stringify(this.outstationQueries));
       this.filterData();
+      this.toast.info(`Request marked as ${newStatus}.`);
     }
   }
 
@@ -374,6 +379,7 @@ export class InquiriesComponent implements OnInit {
       this.generalInquiries = this.generalInquiries.filter(i => i.id !== id);
       localStorage.setItem('general_inquiries', JSON.stringify(this.generalInquiries));
       this.filterData();
+      this.toast.success('Inquiry deleted.');
     }
   }
 
@@ -382,6 +388,7 @@ export class InquiriesComponent implements OnInit {
       this.outstationQueries = this.outstationQueries.filter(i => i.id !== id);
       localStorage.setItem('outstation_queries', JSON.stringify(this.outstationQueries));
       this.filterData();
+      this.toast.success('Outstation request deleted.');
     }
   }
 

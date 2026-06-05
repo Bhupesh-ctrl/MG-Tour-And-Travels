@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../../core/services/api.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-target-management',
@@ -88,7 +89,7 @@ import { ApiService } from '../../../core/services/api.service';
               <td>{{ getFormattedValue(tg.currentValue, tg.metricType) }}</td>
               <td style="width: 200px;">
                 <div style="display: flex; align-items: center; gap: 0.5rem;">
-                  <div style="flex-grow: 1; height: 6px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden; position: relative;">
+                  <div style="flex-grow: 1; height: 6px; background: rgba(197, 155, 39, 0.15); border-radius: 4px; overflow: hidden; position: relative;">
                     <div [style.width.%]="getProgressPercent(tg.currentValue, tg.targetValue)" [style.background]="getProgressColor(tg.status)" style="height: 100%; border-radius: 4px; transition: width 0.3s;"></div>
                   </div>
                   <span style="font-size: 0.8rem; font-weight: 700;">{{ getProgressPercent(tg.currentValue, tg.targetValue) }}%</span>
@@ -233,7 +234,7 @@ export class TargetManagementComponent implements OnInit {
     status: 0
   };
 
-  constructor(private apiService: ApiService) {}
+  constructor(private apiService: ApiService, private toast: ToastService) {}
 
   ngOnInit() {
     this.loadTargets();
@@ -440,6 +441,7 @@ export class TargetManagementComponent implements OnInit {
           if (res.success) {
             this.closeModal();
             this.loadTargets();
+            this.toast.success('Target goal updated successfully.');
           } else {
             this.modalError = res.message || 'Failed to update target.';
           }
@@ -454,6 +456,7 @@ export class TargetManagementComponent implements OnInit {
           if (res.success) {
             this.closeModal();
             this.loadTargets();
+            this.toast.success('Target assigned to driver successfully.');
           } else {
             this.modalError = res.message || 'Failed to create target.';
           }
@@ -471,7 +474,11 @@ export class TargetManagementComponent implements OnInit {
         next: (res) => {
           if (res.success) {
             this.loadTargets();
+            this.toast.success('Target removed.');
           }
+        },
+        error: (err) => {
+          this.toast.error(err.error?.message || 'Error removing target.');
         }
       });
     }

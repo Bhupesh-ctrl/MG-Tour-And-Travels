@@ -13,8 +13,10 @@ export class AuthGuard implements CanActivate {
       const expectedRole = route.data['role'];
       if (expectedRole) {
         const userRole = this.authService.getRole();
-        if (expectedRole !== userRole) {
-          this.router.navigate(['/auth/login']);
+        const hasAccess = expectedRole === userRole || (expectedRole === 'Admin' && userRole === 'SuperAdmin');
+        if (!hasAccess) {
+          const portal = expectedRole === 'Driver' ? 'driver' : 'admin';
+          this.router.navigate(['/auth/login'], { queryParams: { portal } });
           return false;
         }
       }

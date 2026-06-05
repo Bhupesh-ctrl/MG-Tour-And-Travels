@@ -183,8 +183,14 @@ export class LoginComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    const portal = this.route.snapshot.queryParams['portal'];
     const returnUrl = this.route.snapshot.queryParams['returnUrl'];
-    if (returnUrl && returnUrl.toLowerCase().includes('/admin')) {
+    
+    if (portal === 'admin') {
+      this.activeTab = 'admin';
+    } else if (portal === 'driver') {
+      this.activeTab = 'driver';
+    } else if (returnUrl && returnUrl.toLowerCase().includes('/admin')) {
       this.activeTab = 'admin';
     } else if (returnUrl && returnUrl.toLowerCase().includes('/driver')) {
       this.activeTab = 'driver';
@@ -221,7 +227,7 @@ export class LoginComponent implements OnInit {
           const userRole = res.data.role;
 
           // Double check role matches current selected tab
-          if (this.activeTab === 'admin' && userRole !== 'Admin') {
+          if (this.activeTab === 'admin' && userRole !== 'Admin' && userRole !== 'SuperAdmin') {
             this.errorMsg = 'Access denied. You are not authorized as an Admin.';
             this.authService.logout();
             return;
@@ -232,7 +238,7 @@ export class LoginComponent implements OnInit {
             return;
           }
 
-          if (userRole === 'Admin') {
+          if (userRole === 'Admin' || userRole === 'SuperAdmin') {
             this.router.navigate(['/admin/dashboard']);
           } else {
             this.router.navigate(['/driver/dashboard']);

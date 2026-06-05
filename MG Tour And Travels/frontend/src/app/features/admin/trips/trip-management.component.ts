@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../../core/services/api.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-trip-management',
@@ -280,7 +281,7 @@ export class TripManagementComponent implements OnInit {
     notes: ''
   };
 
-  constructor(private apiService: ApiService) {}
+  constructor(private apiService: ApiService, private toast: ToastService) {}
 
   ngOnInit() {
     this.loadTrips();
@@ -458,6 +459,7 @@ export class TripManagementComponent implements OnInit {
           if (res.success) {
             this.closeEditModal();
             this.loadTrips();
+            this.toast.success('Trip record updated successfully.');
           } else {
             this.modalError = res.message || 'Failed to update trip.';
           }
@@ -465,6 +467,7 @@ export class TripManagementComponent implements OnInit {
         error: (err) => {
           this.loading = false;
           this.modalError = this.getErrorMessage(err);
+          this.toast.error(this.modalError);
         }
       });
     }

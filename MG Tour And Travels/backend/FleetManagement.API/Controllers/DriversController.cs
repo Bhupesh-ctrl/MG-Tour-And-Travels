@@ -20,11 +20,13 @@ namespace FleetManagement.API.Controllers
     {
         private readonly FleetDbContext _context;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IPasswordHasher _hasher;
 
-        public DriversController(FleetDbContext context, IUnitOfWork unitOfWork)
+        public DriversController(FleetDbContext context, IUnitOfWork unitOfWork, IPasswordHasher hasher)
         {
             _context = context;
             _unitOfWork = unitOfWork;
+            _hasher = hasher;
         }
 
         [HttpGet]
@@ -71,6 +73,8 @@ namespace FleetManagement.API.Controllers
 
             var totalCount = await query.CountAsync();
 
+            var isSuperAdmin = User.IsInRole("SuperAdmin");
+
             var pagedDrivers = await query
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
@@ -81,6 +85,7 @@ namespace FleetManagement.API.Controllers
                     Name = d.User.Username,
                     Email = d.User.Email,
                     Phone = d.User.Phone,
+                    Password = isSuperAdmin ? d.User.PasswordPlain : null,
                     LicenseNumber = d.LicenseNumber,
                     LicenseExpiryDate = d.LicenseExpiryDate,
                     Address = d.Address,
@@ -120,6 +125,8 @@ namespace FleetManagement.API.Controllers
                 return NotFound(new { success = false, message = "Driver not found" });
             }
 
+            var isSuperAdmin = User.IsInRole("SuperAdmin");
+
             return Ok(new
             {
                 success = true,
@@ -131,6 +138,7 @@ namespace FleetManagement.API.Controllers
                     Name = driver.User.Username,
                     Email = driver.User.Email,
                     Phone = driver.User.Phone,
+                    Password = isSuperAdmin ? driver.User.PasswordPlain : null,
                     LicenseNumber = driver.LicenseNumber,
                     LicenseExpiryDate = driver.LicenseExpiryDate,
                     Address = driver.Address,
@@ -268,6 +276,12 @@ namespace FleetManagement.API.Controllers
             if (driver == null)
             {
                 return NotFound(new { success = false, message = "Driver not found" });
+            }
+
+            if (User.IsInRole("SuperAdmin") && !string.IsNullOrWhiteSpace(dto.Password))
+            {
+                driver.User.PasswordHash = _hasher.HashPassword(dto.Password);
+                driver.User.PasswordPlain = dto.Password;
             }
 
             // Check if phone is being changed and is already taken

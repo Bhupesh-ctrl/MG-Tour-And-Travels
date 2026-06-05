@@ -17,6 +17,7 @@ import { TripManagementComponent } from './features/admin/trips/trip-management.
 import { ExpenseManagementComponent } from './features/admin/expenses/expense-management.component';
 import { TargetManagementComponent } from './features/admin/targets/target-management.component';
 import { AuditTrailComponent } from './features/admin/audits/audit-trail.component';
+import { AdminManagementComponent } from './features/admin/admins/admin-management.component';
 
 import { DriverDashboardComponent } from './features/driver/dashboard/driver-dashboard.component';
 import { DriverTripComponent } from './features/driver/trips/driver-trip.component';
@@ -45,7 +46,8 @@ const routes: Routes = [
       { path: 'targets', component: TargetManagementComponent },
       { path: 'inquiries', component: InquiriesComponent },
       { path: 'reports', component: ReportsComponent },
-      { path: 'auditlogs', component: AuditTrailComponent }
+      { path: 'auditlogs', component: AuditTrailComponent },
+      { path: 'admins', component: AdminManagementComponent, canActivate: [AuthGuard], data: { role: 'SuperAdmin' } }
     ]
   },
 
