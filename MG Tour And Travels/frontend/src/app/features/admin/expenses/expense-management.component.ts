@@ -96,7 +96,7 @@ import { ToastService } from '../../../core/services/toast.service';
               <td style="color: var(--text-primary); font-weight: 700;">{{ exp.amount | currency }}</td>
               <td>{{ exp.description }}</td>
               <td>
-                <a *ngIf="exp.receiptUrl" [href]="'http://localhost:5165' + exp.receiptUrl" target="_blank" class="btn btn-secondary" style="padding: 0.3rem 0.5rem; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 0.25rem;">
+                <a *ngIf="exp.receiptUrl" [href]="'https://mg-fleet-api-g3behhepdyfxgfhh.centralindia-01.azurewebsites.net' + exp.receiptUrl" target="_blank" class="btn btn-secondary" style="padding: 0.3rem 0.5rem; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 0.25rem;">
                   📄 VIEW RECEIPT
                 </a>
                 <span *ngIf="!exp.receiptUrl" style="color: var(--text-muted); font-size: 0.8rem;">No file</span>

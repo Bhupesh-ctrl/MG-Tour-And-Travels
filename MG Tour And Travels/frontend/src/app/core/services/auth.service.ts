@@ -8,7 +8,7 @@ import { map } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:5165/api/auth';
+  private apiUrl = 'https://mg-fleet-api-g3behhepdyfxgfhh.centralindia-01.azurewebsites.net/api/auth';
   private currentUserSubject = new BehaviorSubject<any>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
   private inactivityTimeout: any;

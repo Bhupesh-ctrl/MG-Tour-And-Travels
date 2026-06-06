@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class ApiService {
-  private baseUrl = 'http://localhost:5165/api';
+  private baseUrl = 'https://mg-fleet-api-g3behhepdyfxgfhh.centralindia-01.azurewebsites.net/api';
 
   constructor(private http: HttpClient) {}
 

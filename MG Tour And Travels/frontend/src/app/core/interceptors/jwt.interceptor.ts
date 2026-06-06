@@ -9,7 +9,7 @@ export class JwtInterceptor implements HttpInterceptor {
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     const token = this.authService.token;
-    const isApiUrl = request.url.startsWith('http://localhost:5165');
+    const isApiUrl = request.url.startsWith('https://mg-fleet-api-g3behhepdyfxgfhh.centralindia-01.azurewebsites.net');
     
     if (token && isApiUrl) {
       request = request.clone({

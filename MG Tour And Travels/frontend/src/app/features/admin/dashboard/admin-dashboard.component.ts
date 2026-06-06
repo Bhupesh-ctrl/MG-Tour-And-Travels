@@ -1116,14 +1116,14 @@ export class AdminDashboardComponent implements OnInit {
         });
 
         // Seed with realistic demo dataset if db tables are bare
-        this.generateMockData();
+        // this.generateMockData();
 
         this.loading = false;
         this.onFilterChange();
       },
       error: (err) => {
         console.error('Error loading dashboard datasets, using mock data.', err);
-        this.generateMockData();
+        // this.generateMockData();
         this.loading = false;
         this.onFilterChange();
       }
@@ -1220,13 +1220,13 @@ export class AdminDashboardComponent implements OnInit {
     });
     this.monthlyTargetsCompletionRate = totalTarget > 0 
       ? Math.min(100, Math.round((totalCompleted / totalTarget) * 100)) 
-      : (targetSubset.length > 0 ? 0 : 80);
+      : 0;
 
     // Route completion rate
     const completedTripsCount = this.filteredTrips.filter((t: any) => t.status === 2).length;
     const cancelledTripsCount = this.filteredTrips.filter((t: any) => t.status === 3).length;
     const totalTripsForCompletion = completedTripsCount + cancelledTripsCount;
-    this.routeCompletionRate = totalTripsForCompletion > 0 ? Math.round((completedTripsCount / totalTripsForCompletion) * 100) : 92;
+    this.routeCompletionRate = totalTripsForCompletion > 0 ? Math.round((completedTripsCount / totalTripsForCompletion) * 100) : 0;
 
     // 4. Cab Performance (Best vs Lowest)
     const cabEarningsMap = new Map<string, number>();
@@ -1458,8 +1458,9 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   getCategoryName(cat: any): string {
-    if (typeof cat === 'number') {
-      switch (cat) {
+    const num = typeof cat === 'number' ? cat : parseInt(cat, 10);
+    if (!isNaN(num)) {
+      switch (num) {
         case 0: return 'Fuel / CNG';
         case 1: return 'Maintenance';
         case 2: return 'Tolls';
@@ -1642,13 +1643,7 @@ export class AdminDashboardComponent implements OnInit {
       .slice(0, 5);
 
     if (topRoutes.length === 0) {
-      topRoutes.push(
-        { route: 'Delhi Airport ➜ Noida Sec 62', total: 12, completed: 11 },
-        { route: 'Gurgaon Cyber City ➜ Dwarka', total: 10, completed: 9 },
-        { route: 'Connaught Place ➜ Ghaziabad', total: 8, completed: 7 },
-        { route: 'Noida Sec 18 ➜ Faridabad', total: 6, completed: 5 },
-        { route: 'Dwarka Sec 21 ➜ Noida 137', total: 5, completed: 5 }
-      );
+      // Keep empty if no routes are logged yet.
     }
 
     this.routeCompletionBars = topRoutes.map((r: any, i: number) => {

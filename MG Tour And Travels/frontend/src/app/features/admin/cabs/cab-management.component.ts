@@ -228,7 +228,7 @@ import { ToastService } from '../../../core/services/toast.service';
                   <td>{{ getDocTypeLabel(doc.documentType) }}</td>
                   <td>{{ doc.expiryDate ? (doc.expiryDate | date:'mediumDate') : 'No Expiry' }}</td>
                   <td>
-                    <a *ngIf="doc.documentUrl" [href]="'http://localhost:5165' + doc.documentUrl" target="_blank" class="btn btn-secondary" style="padding: 0.2rem 0.4rem; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 0.25rem;">
+                    <a *ngIf="doc.documentUrl" [href]="'https://mg-fleet-api-g3behhepdyfxgfhh.centralindia-01.azurewebsites.net' + doc.documentUrl" target="_blank" class="btn btn-secondary" style="padding: 0.2rem 0.4rem; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 0.25rem;">
                       📄 VIEW
                     </a>
                   </td>
