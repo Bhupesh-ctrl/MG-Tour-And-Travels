@@ -80,7 +80,7 @@ import { ToastService } from '../../../core/services/toast.service';
               </td>
             </tr>
             <tr *ngFor="let trip of trips">
-              <td><strong>#{{ trip.id }}</strong></td>
+              <td><strong>#{{ trip.vendorTripId || trip.id }}</strong></td>
               <td><code>{{ trip.vehicleNumber }}</code></td>
               <td>{{ trip.driverName }}</td>
               <td>{{ trip.startTime | date:'short' }}</td>
@@ -129,6 +129,11 @@ import { ToastService } from '../../../core/services/toast.service';
 
           <div *ngIf="modalError" class="badge badge-danger" style="width: 100%; padding: 0.75rem; border-radius: 8px; margin-bottom: 1rem; justify-content: center; text-transform: none; text-align: center;">
             {{ modalError }}
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Vendor Trip ID *</label>
+            <input type="number" class="form-control" [(ngModel)]="tripForm.vendorTripId" placeholder="Vendor Trip ID" />
           </div>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
@@ -278,7 +283,8 @@ export class TripManagementComponent implements OnInit {
     fuelConsumed: null as number | null,
     fareAmount: null as number | null,
     tollAmount: null as number | null,
-    notes: ''
+    notes: '',
+    vendorTripId: null as number | null
   };
 
   constructor(private apiService: ApiService, private toast: ToastService) {}
@@ -321,7 +327,9 @@ export class TripManagementComponent implements OnInit {
 
   applyFilters() {
     this.filteredTrips = this.allTrips.filter(trip => {
-      const matchId = !this.filters.id || trip.id.toString().includes(this.filters.id);
+      const matchId = !this.filters.id || 
+        trip.id.toString().includes(this.filters.id) ||
+        (trip.vendorTripId && trip.vendorTripId.toString().includes(this.filters.id));
       const matchVehicle = !this.filters.vehicleNumber || trip.vehicleNumber.toLowerCase().includes(this.filters.vehicleNumber.toLowerCase());
       const matchDriver = !this.filters.driverName || trip.driverName.toLowerCase().includes(this.filters.driverName.toLowerCase());
       
@@ -407,7 +415,8 @@ export class TripManagementComponent implements OnInit {
       fuelConsumed: trip.fuelConsumed,
       fareAmount: trip.fareAmount,
       tollAmount: trip.tollAmount,
-      notes: trip.notes || ''
+      notes: trip.notes || '',
+      vendorTripId: trip.vendorTripId
     };
     this.showEditModal = true;
   }
@@ -419,6 +428,10 @@ export class TripManagementComponent implements OnInit {
   }
 
   saveTrip() {
+    if (!this.tripForm.vendorTripId) {
+      this.modalError = 'Please specify a Vendor Trip ID.';
+      return;
+    }
     if (!this.tripForm.cabId || !this.tripForm.driverId) {
       this.modalError = 'Please select a cab and a driver.';
       return;
@@ -436,6 +449,7 @@ export class TripManagementComponent implements OnInit {
     this.modalError = '';
 
     const payload = {
+      vendorTripId: parseInt(this.tripForm.vendorTripId.toString(), 10),
       cabId: parseInt(this.tripForm.cabId.toString(), 10),
       driverId: parseInt(this.tripForm.driverId.toString(), 10),
       startTime: new Date(this.tripForm.startTime).toISOString(),

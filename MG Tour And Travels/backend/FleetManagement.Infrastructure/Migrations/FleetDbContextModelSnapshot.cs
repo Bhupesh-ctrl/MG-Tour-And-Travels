@@ -450,7 +450,10 @@ namespace FleetManagement.Infrastructure.Migrations
             modelBuilder.Entity("FleetManagement.Core.Entities.Trip", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("CabId")
                         .HasColumnType("int");
@@ -514,6 +517,9 @@ namespace FleetManagement.Infrastructure.Migrations
 
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("VendorTripId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

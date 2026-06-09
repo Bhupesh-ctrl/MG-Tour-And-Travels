@@ -205,6 +205,7 @@ namespace FleetManagement.API.Controllers
                 var activeTripDto = activeTrip != null ? new TripDto
                 {
                     Id = activeTrip.Id,
+                    VendorTripId = activeTrip.VendorTripId,
                     CabId = activeTrip.CabId,
                     VehicleNumber = activeTrip.Cab.VehicleNumber,
                     StartTime = activeTrip.StartTime,

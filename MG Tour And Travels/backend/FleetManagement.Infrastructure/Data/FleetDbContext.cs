@@ -58,9 +58,6 @@ namespace FleetManagement.Infrastructure.Data
                 .HasForeignKey(d => d.CurrentCabId)
                 .OnDelete(DeleteBehavior.SetNull);
 
-            modelBuilder.Entity<Trip>()
-                .Property(t => t.Id)
-                .ValueGeneratedNever();
 
             modelBuilder.Entity<Trip>()
                 .HasOne(t => t.Cab)

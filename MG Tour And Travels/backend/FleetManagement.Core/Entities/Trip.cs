@@ -5,6 +5,8 @@ namespace FleetManagement.Core.Entities
 {
     public class Trip : AuditableEntity
     {
+        public int VendorTripId { get; set; }
+
         public int CabId { get; set; }
         public Cab Cab { get; set; }
 

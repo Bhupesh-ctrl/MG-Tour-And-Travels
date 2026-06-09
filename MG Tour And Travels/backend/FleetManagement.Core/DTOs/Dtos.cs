@@ -104,6 +104,7 @@ namespace FleetManagement.Core.DTOs
     public class TripDto
     {
         public int Id { get; set; }
+        public int VendorTripId { get; set; }
         public int CabId { get; set; }
         public string VehicleNumber { get; set; }
         public int DriverId { get; set; }
@@ -359,6 +360,7 @@ namespace FleetManagement.Core.DTOs
 
     public class UpdateTripDto
     {
+        public int VendorTripId { get; set; }
         public int CabId { get; set; }
         public int DriverId { get; set; }
         public DateTime StartTime { get; set; }

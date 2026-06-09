@@ -90,6 +90,7 @@ namespace FleetManagement.API.Controllers
                 .Select(t => new TripDto
                 {
                     Id = t.Id,
+                    VendorTripId = t.VendorTripId,
                     CabId = t.CabId,
                     VehicleNumber = t.Cab.VehicleNumber,
                     DriverId = t.DriverId,
@@ -151,6 +152,7 @@ namespace FleetManagement.API.Controllers
                 data = new TripDto
                 {
                     Id = trip.Id,
+                    VendorTripId = trip.VendorTripId,
                     CabId = trip.CabId,
                     VehicleNumber = trip.Cab.VehicleNumber,
                     DriverId = trip.DriverId,
@@ -200,13 +202,6 @@ namespace FleetManagement.API.Controllers
                 return BadRequest(new { success = false, message = "Please select either Pickup or Drop." });
             }
 
-            // Check if Trip ID already exists in the database
-            var existingTrip = await _context.Trips.IgnoreQueryFilters().FirstOrDefaultAsync(t => t.Id == dto.TripId);
-            if (existingTrip != null)
-            {
-                return BadRequest(new { success = false, message = $"A trip with ID {dto.TripId} already exists." });
-            }
-
             // Check if driver has an active trip already
             var activeTrip = await _context.Trips
                 .FirstOrDefaultAsync(t => t.DriverId == driverId.Value && t.Status == TripStatus.Active);
@@ -225,7 +220,7 @@ namespace FleetManagement.API.Controllers
 
             var trip = new Trip
             {
-                Id = dto.TripId,
+                VendorTripId = dto.TripId,
                 CabId = dto.CabId,
                 DriverId = driverId.Value,
                 StartTime = DateTime.UtcNow,
@@ -448,13 +443,6 @@ namespace FleetManagement.API.Controllers
                 return BadRequest(new { success = false, message = "Status must be Completed or Cancelled." });
             }
 
-            // Check if Trip ID already exists in the database
-            var existingTrip = await _context.Trips.IgnoreQueryFilters().FirstOrDefaultAsync(t => t.Id == dto.TripId);
-            if (existingTrip != null)
-            {
-                return BadRequest(new { success = false, message = $"A trip with ID {dto.TripId} already exists." });
-            }
-
             // Verify cab assignment
             var driver = await _context.Drivers.FindAsync(driverId.Value);
             if (driver == null || driver.CurrentCabId != dto.CabId)
@@ -466,7 +454,7 @@ namespace FleetManagement.API.Controllers
 
             var trip = new Trip
             {
-                Id = dto.TripId,
+                VendorTripId = dto.TripId,
                 CabId = dto.CabId,
                 DriverId = driverId.Value,
                 StartTime = DateTime.UtcNow.AddHours(-1),
@@ -570,6 +558,7 @@ namespace FleetManagement.API.Controllers
             try
             {
                 // 1. Update trip properties
+                trip.VendorTripId = dto.VendorTripId;
                 trip.CabId = dto.CabId;
                 trip.DriverId = dto.DriverId;
                 trip.StartTime = dto.StartTime;

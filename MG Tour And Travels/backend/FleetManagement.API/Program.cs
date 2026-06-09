@@ -64,7 +64,15 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", policy =>
     {
-        policy.WithOrigins("http://localhost:4200") // Angular default port
+        var allowedOrigins = builder.Configuration["Cors:AllowedOrigins"]?.Split(',')
+            ?? new[] { 
+                "http://localhost:4200", 
+                "https://kind-mushroom-0faabfb00.7.azurestaticapps.net",
+                "https://mgtourandtravels.in",
+                "https://www.mgtourandtravels.in"
+            };
+
+        policy.WithOrigins(allowedOrigins)
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials();

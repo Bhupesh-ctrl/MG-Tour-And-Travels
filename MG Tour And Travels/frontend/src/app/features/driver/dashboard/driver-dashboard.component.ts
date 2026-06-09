@@ -98,7 +98,7 @@ import { AuthService } from '../../../core/services/auth.service';
             </div>
             <div class="form-group" style="margin-bottom: 0;">
               <label class="form-label" style="font-weight: 600; font-size: 0.9rem;">End Odometer (km) *</label>
-              <input type="number" class="form-control" [(ngModel)]="endTripForm.endOdometer" placeholder="Current Odometer" style="padding: 0.65rem;" />
+              <input type="number" class="form-control" [(ngModel)]="endTripForm.endOdometer" placeholder="e.g. 12080" style="padding: 0.65rem;" />
             </div>
           </div>
 
@@ -161,7 +161,7 @@ import { AuthService } from '../../../core/services/auth.service';
             </div>
             <div class="form-group" style="margin-bottom: 0;">
               <label class="form-label" style="font-weight: 600; font-size: 0.9rem;">Odometer Reading (km) *</label>
-              <input type="number" class="form-control" [(ngModel)]="startTripForm.startOdometer" placeholder="Current Odometer" style="padding: 0.65rem;" />
+              <input type="number" class="form-control" [(ngModel)]="startTripForm.startOdometer" placeholder="e.g. 12050" style="padding: 0.65rem;" />
             </div>
           </div>
 
@@ -287,7 +287,7 @@ export class DriverDashboardComponent implements OnInit {
   } = {
     tripId: null,
     startLocation: '',
-    startOdometer: 0,
+    startOdometer: null,
     pickupOrDrop: 'Pickup',
     notes: ''
   };
@@ -298,7 +298,7 @@ export class DriverDashboardComponent implements OnInit {
     notes: string;
   } = {
     endLocation: '',
-    endOdometer: 0,
+    endOdometer: null,
     notes: ''
   };
 
@@ -315,8 +315,8 @@ export class DriverDashboardComponent implements OnInit {
     tripId: null,
     startLocation: '',
     endLocation: '',
-    startOdometer: 0,
-    endOdometer: 0,
+    startOdometer: null,
+    endOdometer: null,
     pickupOrDrop: 'Pickup',
     status: 'Completed',
     notes: ''
@@ -390,7 +390,7 @@ export class DriverDashboardComponent implements OnInit {
         this.startTripForm = {
           tripId: null,
           startLocation: '',
-          startOdometer: 0,
+          startOdometer: null,
           pickupOrDrop: 'Pickup',
           notes: ''
         };
@@ -438,7 +438,7 @@ export class DriverDashboardComponent implements OnInit {
         this.loading = false;
         this.endTripForm = {
           endLocation: '',
-          endOdometer: 0,
+          endOdometer: null,
           notes: ''
         };
         this.loadDriverData();
@@ -506,8 +506,8 @@ export class DriverDashboardComponent implements OnInit {
           tripId: null,
           startLocation: '',
           endLocation: '',
-          startOdometer: 0,
-          endOdometer: 0,
+          startOdometer: null,
+          endOdometer: null,
           pickupOrDrop: 'Pickup',
           status: 'Completed',
           notes: ''
@@ -588,7 +588,7 @@ export class DriverDashboardComponent implements OnInit {
           this.loading = false;
           this.endTripForm = {
             endLocation: '',
-            endOdometer: 0,
+            endOdometer: null,
             notes: ''
           };
           this.loadDriverData();
