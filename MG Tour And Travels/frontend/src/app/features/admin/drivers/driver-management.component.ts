@@ -777,6 +777,9 @@ export class DriverManagementComponent implements OnInit {
     if (!driver) return;
 
     const payload = {
+      name: driver.name,
+      email: driver.email,
+      phone: driver.phone,
       licenseNumber: driver.licenseNumber,
       licenseExpiryDate: driver.licenseExpiryDate,
       address: driver.address,
@@ -789,7 +792,12 @@ export class DriverManagementComponent implements OnInit {
         if (res.success) {
           this.loadDrivers();
           this.toast.success(`Driver ${status === 'Approved' ? 'approved' : 'rejected'} successfully.`);
+        } else {
+          this.toast.error(res.message || 'Failed to verify driver.');
         }
+      },
+      error: (err) => {
+        this.toast.error(err.error?.message || 'Server error verifying driver.');
       }
     });
   }
