@@ -476,6 +476,7 @@ namespace FleetManagement.API.Controllers
             try
             {
                 _context.Trips.Add(trip);
+                await _context.SaveChangesAsync();
 
                 if (tripStatus == TripStatus.Completed)
                 {

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../../core/services/api.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-driver-dashboard',
@@ -322,7 +323,7 @@ export class DriverDashboardComponent implements OnInit {
     notes: ''
   };
 
-  constructor(private apiService: ApiService, private authService: AuthService) {}
+  constructor(private apiService: ApiService, private authService: AuthService, private toast: ToastService) {}
 
   ngOnInit() {
     this.loadDriverData();
@@ -356,19 +357,19 @@ export class DriverDashboardComponent implements OnInit {
 
   startTrip() {
     if (!this.startTripForm.tripId) {
-      this.errorMsg = 'Please input manual Trip ID.';
+      this.toast.error('Please input manual Trip ID.');
       return;
     }
     if (!this.startTripForm.pickupOrDrop) {
-      this.errorMsg = 'Please select service type (Pickup/Drop).';
+      this.toast.error('Please select service type (Pickup/Drop).');
       return;
     }
     if (!this.startTripForm.startLocation) {
-      this.errorMsg = 'Please specify Start Location.';
+      this.toast.error('Please specify Start Location.');
       return;
     }
     if (!this.startTripForm.startOdometer || this.startTripForm.startOdometer <= 0) {
-      this.errorMsg = 'Please specify a valid Start Odometer reading.';
+      this.toast.error('Please specify a valid Start Odometer reading.');
       return;
     }
     
@@ -387,6 +388,7 @@ export class DriverDashboardComponent implements OnInit {
     this.apiService.startTrip(payload).subscribe({
       next: (res) => {
         this.loading = false;
+        this.toast.success('Trip started successfully!');
         this.startTripForm = {
           tripId: null,
           startLocation: '',
@@ -398,7 +400,9 @@ export class DriverDashboardComponent implements OnInit {
       },
       error: (err) => {
         this.loading = false;
-        this.errorMsg = err.error?.message || 'Error starting trip.';
+        const msg = err.error?.message || 'Error starting trip.';
+        this.errorMsg = msg;
+        this.toast.error(msg);
       }
     });
   }
@@ -407,17 +411,17 @@ export class DriverDashboardComponent implements OnInit {
     if (!this.stats || !this.stats.activeTrip) return;
 
     if (!this.endTripForm.endLocation) {
-      this.errorMsg = 'Please specify End Location.';
+      this.toast.error('Please specify End Location.');
       return;
     }
 
     if (!this.endTripForm.endOdometer || this.endTripForm.endOdometer <= 0) {
-      this.errorMsg = 'Please enter a valid End Odometer reading.';
+      this.toast.error('Please enter a valid End Odometer reading.');
       return;
     }
 
     if (this.endTripForm.endOdometer < this.stats.activeTrip.startOdometer) {
-      this.errorMsg = `End odometer must be greater than or equal to start odometer (${this.stats.activeTrip.startOdometer}).`;
+      this.toast.error(`End odometer must be greater than or equal to start odometer (${this.stats.activeTrip.startOdometer}).`);
       return;
     }
 
@@ -436,6 +440,7 @@ export class DriverDashboardComponent implements OnInit {
     this.apiService.endTrip(this.stats.activeTrip.id, payload).subscribe({
       next: (res) => {
         this.loading = false;
+        this.toast.success('Trip completed successfully!');
         this.endTripForm = {
           endLocation: '',
           endOdometer: null,
@@ -445,42 +450,44 @@ export class DriverDashboardComponent implements OnInit {
       },
       error: (err) => {
         this.loading = false;
-        this.errorMsg = err.error?.message || 'Error ending trip.';
+        const msg = err.error?.message || 'Error ending trip.';
+        this.errorMsg = msg;
+        this.toast.error(msg);
       }
     });
   }
 
   logPastTrip() {
     if (!this.pastTripForm.tripId) {
-      this.errorMsg = 'Please input manual Trip ID.';
+      this.toast.error('Please input manual Trip ID.');
       return;
     }
     if (!this.pastTripForm.pickupOrDrop) {
-      this.errorMsg = 'Please select service type (Pickup/Drop).';
+      this.toast.error('Please select service type (Pickup/Drop).');
       return;
     }
     if (!this.pastTripForm.startLocation) {
-      this.errorMsg = 'Please specify Start Location.';
+      this.toast.error('Please specify Start Location.');
       return;
     }
     if (!this.pastTripForm.endLocation) {
-      this.errorMsg = 'Please specify End Location.';
+      this.toast.error('Please specify End Location.');
       return;
     }
     if (!this.pastTripForm.startOdometer || this.pastTripForm.startOdometer <= 0) {
-      this.errorMsg = 'Please specify a valid Start Odometer reading.';
+      this.toast.error('Please specify a valid Start Odometer reading.');
       return;
     }
     if (!this.pastTripForm.endOdometer || this.pastTripForm.endOdometer <= 0) {
-      this.errorMsg = 'Please specify a valid End Odometer reading.';
+      this.toast.error('Please specify a valid End Odometer reading.');
       return;
     }
     if (this.pastTripForm.endOdometer < this.pastTripForm.startOdometer) {
-      this.errorMsg = 'End Odometer reading cannot be less than Start Odometer reading.';
+      this.toast.error('End Odometer reading cannot be less than Start Odometer reading.');
       return;
     }
     if (!this.pastTripForm.status) {
-      this.errorMsg = 'Please select Trip Status.';
+      this.toast.error('Please select Trip Status.');
       return;
     }
 
@@ -502,6 +509,7 @@ export class DriverDashboardComponent implements OnInit {
     this.apiService.logPastTrip(payload).subscribe({
       next: (res) => {
         this.loading = false;
+        this.toast.success('Past trip logged successfully!');
         this.pastTripForm = {
           tripId: null,
           startLocation: '',
@@ -516,7 +524,9 @@ export class DriverDashboardComponent implements OnInit {
       },
       error: (err) => {
         this.loading = false;
-        this.errorMsg = err.error?.message || 'Error logging past trip.';
+        const msg = err.error?.message || 'Error logging past trip.';
+        this.errorMsg = msg;
+        this.toast.error(msg);
       }
     });
   }
@@ -559,17 +569,17 @@ export class DriverDashboardComponent implements OnInit {
     const tripId = this.stats.activeTrip.id;
 
     if (!this.endTripForm.endLocation) {
-      this.errorMsg = 'Please specify End Location before cancelling.';
+      this.toast.error('Please specify End Location before cancelling.');
       return;
     }
 
     if (!this.endTripForm.endOdometer || this.endTripForm.endOdometer <= 0) {
-      this.errorMsg = 'Please enter a valid End Odometer reading before cancelling.';
+      this.toast.error('Please enter a valid End Odometer reading before cancelling.');
       return;
     }
 
     if (this.endTripForm.endOdometer < this.stats.activeTrip.startOdometer) {
-      this.errorMsg = `End odometer must be greater than or equal to start odometer (${this.stats.activeTrip.startOdometer}) before cancelling.`;
+      this.toast.error(`End odometer must be greater than or equal to start odometer (${this.stats.activeTrip.startOdometer}) before cancelling.`);
       return;
     }
 
@@ -586,6 +596,7 @@ export class DriverDashboardComponent implements OnInit {
       this.apiService.cancelTrip(tripId, payload).subscribe({
         next: (res) => {
           this.loading = false;
+          this.toast.success('Trip cancelled successfully.');
           this.endTripForm = {
             endLocation: '',
             endOdometer: null,
@@ -595,7 +606,9 @@ export class DriverDashboardComponent implements OnInit {
         },
         error: (err) => {
           this.loading = false;
-          this.errorMsg = err.error?.message || 'Error cancelling active trip.';
+          const msg = err.error?.message || 'Error cancelling active trip.';
+          this.errorMsg = msg;
+          this.toast.error(msg);
         }
       });
     }
