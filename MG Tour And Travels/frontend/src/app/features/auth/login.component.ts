@@ -180,12 +180,12 @@ export class LoginComponent implements OnInit {
     private authService: AuthService,
     private router: Router,
     private route: ActivatedRoute
-  ) {}
+  ) { }
 
   ngOnInit() {
     const portal = this.route.snapshot.queryParams['portal'];
     const returnUrl = this.route.snapshot.queryParams['returnUrl'];
-    
+
     if (portal === 'admin') {
       this.activeTab = 'admin';
     } else if (portal === 'driver') {
@@ -264,8 +264,8 @@ export class LoginComponent implements OnInit {
 
     // Pass empty string for OTP since the backend has bypassed OTP verification
     this.authService.signupDriver(
-      this.signupForm.phone, 
-      '', 
+      this.signupForm.phone,
+      '',
       this.signupForm.password
     ).subscribe({
       next: (res) => {
