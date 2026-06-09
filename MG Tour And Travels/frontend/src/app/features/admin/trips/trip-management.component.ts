@@ -31,6 +31,7 @@ import { ToastService } from '../../../core/services/toast.service';
               <th>Trip ID</th>
               <th>Cab Plate</th>
               <th>Driver</th>
+              <th>Route</th>
               <th>Start Time</th>
               <th>End Time</th>
               <th>Odometer (Start ➜ End)</th>
@@ -48,6 +49,9 @@ import { ToastService } from '../../../core/services/toast.service';
               </td>
               <td>
                 <input type="text" class="form-control" style="padding: 0.35rem 0.5rem; font-size: 0.8rem; height: auto;" placeholder="Filter Driver..." [(ngModel)]="filters.driverName" (input)="applyFilters()" />
+              </td>
+              <td>
+                <input type="text" class="form-control" style="padding: 0.35rem 0.5rem; font-size: 0.8rem; height: auto;" placeholder="Filter Route..." [(ngModel)]="filters.route" (input)="applyFilters()" />
               </td>
               <td>
                 <input type="text" class="form-control" style="padding: 0.35rem 0.5rem; font-size: 0.8rem; height: auto;" placeholder="Filter Start..." [(ngModel)]="filters.startTime" (input)="applyFilters()" />
@@ -75,7 +79,7 @@ import { ToastService } from '../../../core/services/toast.service';
           </thead>
           <tbody>
             <tr *ngIf="trips.length === 0">
-              <td colspan="9" style="text-align: center; color: var(--text-muted); padding: 3rem;">
+              <td colspan="10" style="text-align: center; color: var(--text-muted); padding: 3rem;">
                 No trips matching search filters.
               </td>
             </tr>
@@ -83,6 +87,10 @@ import { ToastService } from '../../../core/services/toast.service';
               <td><strong>#{{ trip.vendorTripId || trip.id }}</strong></td>
               <td><code>{{ trip.vehicleNumber }}</code></td>
               <td>{{ trip.driverName }}</td>
+              <td>
+                <div style="font-weight: 600;">{{ trip.startLocation }} ➜ {{ trip.endLocation || '...' }}</div>
+                <div style="font-size: 0.75rem; color: var(--text-secondary);">Type: {{ trip.pickupOrDrop }}</div>
+              </td>
               <td>{{ trip.startTime | date:'short' }}</td>
               <td>{{ trip.endTime ? (trip.endTime | date:'short') : 'Ongoing...' }}</td>
               <td>
@@ -250,6 +258,7 @@ export class TripManagementComponent implements OnInit {
     id: '',
     vehicleNumber: '',
     driverName: '',
+    route: '',
     startTime: '',
     endTime: '',
     odometer: '',
@@ -333,6 +342,9 @@ export class TripManagementComponent implements OnInit {
       const matchVehicle = !this.filters.vehicleNumber || trip.vehicleNumber.toLowerCase().includes(this.filters.vehicleNumber.toLowerCase());
       const matchDriver = !this.filters.driverName || trip.driverName.toLowerCase().includes(this.filters.driverName.toLowerCase());
       
+      const routeStr = `${trip.startLocation} to ${trip.endLocation || ''}`;
+      const matchRoute = !this.filters.route || routeStr.toLowerCase().includes(this.filters.route.toLowerCase());
+
       const matchStart = !this.filters.startTime || 
         new Date(trip.startTime).toLocaleDateString().toLowerCase().includes(this.filters.startTime.toLowerCase()) ||
         new Date(trip.startTime).toLocaleTimeString().toLowerCase().includes(this.filters.startTime.toLowerCase());
@@ -353,7 +365,7 @@ export class TripManagementComponent implements OnInit {
       let statusLabel = this.getStatusLabel(trip.status);
       const matchStatus = !this.filters.status || statusLabel.toLowerCase() === this.filters.status.toLowerCase();
 
-      return matchId && matchVehicle && matchDriver && matchStart && matchEnd && matchOdo && matchFinancials && matchStatus;
+      return matchId && matchVehicle && matchDriver && matchRoute && matchStart && matchEnd && matchOdo && matchFinancials && matchStatus;
     });
 
     this.totalCount = this.filteredTrips.length;
