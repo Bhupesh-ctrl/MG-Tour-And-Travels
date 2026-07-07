@@ -166,6 +166,34 @@ import { ToastService } from '../../../core/services/toast.service';
             </div>
           </div>
 
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" style="font-weight: 600; font-size: 0.9rem;">Guard Route *</label>
+              <select class="form-control" [(ngModel)]="startTripForm.isGuardRoute" style="padding: 0.65rem; height: auto;">
+                <option [ngValue]="true">Yes</option>
+                <option [ngValue]="false">No</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" style="font-weight: 600; font-size: 0.9rem;">Route Type *</label>
+              <select class="form-control" [(ngModel)]="startTripForm.routeType" style="padding: 0.65rem; height: auto;">
+                <option value="Gurgaon">Gurgaon</option>
+                <option value="Delhi">Delhi</option>
+                <option value="Faridabad">Faridabad</option>
+                <option value="Manesar">Manesar</option>
+                <option value="Noida">Noida</option>
+                <option value="Ghaziabad">Ghaziabad</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" style="font-weight: 600; font-size: 0.9rem;">Toll Route *</label>
+              <select class="form-control" [(ngModel)]="startTripForm.isTollRoute" style="padding: 0.65rem; height: auto;">
+                <option [ngValue]="true">Yes</option>
+                <option [ngValue]="false">No</option>
+              </select>
+            </div>
+          </div>
+
           <div class="form-group" style="margin-bottom: 1.5rem;">
             <label class="form-label" style="font-weight: 600; font-size: 0.9rem;">Remarks (Optional)</label>
             <input type="text" class="form-control" [(ngModel)]="startTripForm.notes" placeholder="Any remarks or instructions..." style="padding: 0.65rem;" />
@@ -214,7 +242,7 @@ import { ToastService } from '../../../core/services/toast.service';
             </div>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
             <div class="form-group" style="margin-bottom: 0;">
               <label class="form-label" style="font-weight: 600; font-size: 0.9rem;">Trip Status *</label>
               <select class="form-control" [(ngModel)]="pastTripForm.status" style="padding: 0.65rem; height: auto;">
@@ -223,9 +251,35 @@ import { ToastService } from '../../../core/services/toast.service';
               </select>
             </div>
             <div class="form-group" style="margin-bottom: 0;">
-              <label class="form-label" style="font-weight: 600; font-size: 0.9rem;">Remarks (Optional)</label>
-              <input type="text" class="form-control" [(ngModel)]="pastTripForm.notes" placeholder="Any offline/past remarks..." style="padding: 0.65rem;" />
+              <label class="form-label" style="font-weight: 600; font-size: 0.9rem;">Guard Route *</label>
+              <select class="form-control" [(ngModel)]="pastTripForm.isGuardRoute" style="padding: 0.65rem; height: auto;">
+                <option [ngValue]="true">Yes</option>
+                <option [ngValue]="false">No</option>
+              </select>
             </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" style="font-weight: 600; font-size: 0.9rem;">Route Type *</label>
+              <select class="form-control" [(ngModel)]="pastTripForm.routeType" style="padding: 0.65rem; height: auto;">
+                <option value="Gurgaon">Gurgaon</option>
+                <option value="Delhi">Delhi</option>
+                <option value="Faridabad">Faridabad</option>
+                <option value="Manesar">Manesar</option>
+                <option value="Noida">Noida</option>
+                <option value="Ghaziabad">Ghaziabad</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" style="font-weight: 600; font-size: 0.9rem;">Toll Route *</label>
+              <select class="form-control" [(ngModel)]="pastTripForm.isTollRoute" style="padding: 0.65rem; height: auto;">
+                <option [ngValue]="true">Yes</option>
+                <option [ngValue]="false">No</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1.5rem;">
+            <label class="form-label" style="font-weight: 600; font-size: 0.9rem;">Remarks (Optional)</label>
+            <input type="text" class="form-control" [(ngModel)]="pastTripForm.notes" placeholder="Any offline/past remarks..." style="padding: 0.65rem;" />
           </div>
 
           <button class="btn btn-accent" style="width: 100%; padding: 0.85rem;" (click)="logPastTrip()" [disabled]="loading">
@@ -285,12 +339,18 @@ export class DriverDashboardComponent implements OnInit {
     startOdometer: number | null;
     pickupOrDrop: string;
     notes: string;
+    isGuardRoute: boolean;
+    routeType: string;
+    isTollRoute: boolean;
   } = {
     tripId: null,
     startLocation: '',
     startOdometer: null,
     pickupOrDrop: 'Pickup',
-    notes: ''
+    notes: '',
+    isGuardRoute: false,
+    routeType: 'Gurgaon',
+    isTollRoute: false
   };
 
   endTripForm: {
@@ -312,6 +372,9 @@ export class DriverDashboardComponent implements OnInit {
     pickupOrDrop: string;
     status: string;
     notes: string;
+    isGuardRoute: boolean;
+    routeType: string;
+    isTollRoute: boolean;
   } = {
     tripId: null,
     startLocation: '',
@@ -320,7 +383,10 @@ export class DriverDashboardComponent implements OnInit {
     endOdometer: null,
     pickupOrDrop: 'Pickup',
     status: 'Completed',
-    notes: ''
+    notes: '',
+    isGuardRoute: false,
+    routeType: 'Gurgaon',
+    isTollRoute: false
   };
 
   constructor(private apiService: ApiService, private authService: AuthService, private toast: ToastService) {}
@@ -382,7 +448,10 @@ export class DriverDashboardComponent implements OnInit {
       startOdometer: this.startTripForm.startOdometer ? parseInt(this.startTripForm.startOdometer.toString(), 10) : 0,
       startLocation: this.startTripForm.startLocation,
       pickupOrDrop: this.startTripForm.pickupOrDrop,
-      notes: this.startTripForm.notes
+      notes: this.startTripForm.notes,
+      isGuardRoute: this.startTripForm.isGuardRoute,
+      routeType: this.startTripForm.routeType,
+      isTollRoute: this.startTripForm.isTollRoute
     };
 
     this.apiService.startTrip(payload).subscribe({
@@ -394,7 +463,10 @@ export class DriverDashboardComponent implements OnInit {
           startLocation: '',
           startOdometer: null,
           pickupOrDrop: 'Pickup',
-          notes: ''
+          notes: '',
+          isGuardRoute: false,
+          routeType: 'Gurgaon',
+          isTollRoute: false
         };
         this.loadDriverData();
       },
@@ -503,7 +575,10 @@ export class DriverDashboardComponent implements OnInit {
       endOdometer: this.pastTripForm.endOdometer ? parseInt(this.pastTripForm.endOdometer.toString(), 10) : 0,
       pickupOrDrop: this.pastTripForm.pickupOrDrop,
       status: this.pastTripForm.status,
-      notes: this.pastTripForm.notes
+      notes: this.pastTripForm.notes,
+      isGuardRoute: this.pastTripForm.isGuardRoute,
+      routeType: this.pastTripForm.routeType,
+      isTollRoute: this.pastTripForm.isTollRoute
     };
 
     this.apiService.logPastTrip(payload).subscribe({
@@ -518,7 +593,10 @@ export class DriverDashboardComponent implements OnInit {
           endOdometer: null,
           pickupOrDrop: 'Pickup',
           status: 'Completed',
-          notes: ''
+          notes: '',
+          isGuardRoute: false,
+          routeType: 'Gurgaon',
+          isTollRoute: false
         };
         this.loadDriverData();
       },

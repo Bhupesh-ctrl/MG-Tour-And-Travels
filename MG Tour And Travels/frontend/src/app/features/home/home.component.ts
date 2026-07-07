@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ApiService } from '../../core/services/api.service';
 
 @Component({
   selector: 'app-home',
@@ -105,8 +106,8 @@ import { Component, OnInit } from '@angular/core';
       <section id="fleet" class="fleet-section">
         <div class="section-header">
           <span class="section-subtitle">OUR VEHICLES</span>
-          <h3 class="section-title">The Premium Sedan Fleet</h3>
-          <p class="section-desc">Our entire fleet consists of well-maintained, air-conditioned premium sedans driven by professional, verified chauffeurs.</p>
+          <h3 class="section-title">Our Premium Fleet</h3>
+          <p class="section-desc">Our entire fleet consists of well-maintained, air-conditioned premium sedans and MUVs driven by professional, verified chauffeurs.</p>
         </div>
 
         <div class="fleet-grid">
@@ -143,6 +144,24 @@ import { Component, OnInit } from '@angular/core';
                 <li><span>✔</span> GPS Tracked & Clean</li>
               </ul>
               <button class="btn btn-secondary btn-full" (click)="selectCar('Hyundai Aura')">Select for Inquiry</button>
+            </div>
+          </div>
+
+          <div class="fleet-card glass-card">
+            <div class="car-badge">SPACIOUS</div>
+            <div class="car-image-container">
+              <img src="/assets/ertiga.png" alt="Maruti Suzuki Ertiga" class="car-img" />
+            </div>
+            <div class="fleet-info">
+              <h4>Maruti Suzuki Ertiga</h4>
+              <p class="fleet-type">Premium MUV</p>
+              <ul class="fleet-features">
+                <li><span>✔</span> 6 + 1 Passengers</li>
+                <li><span>✔</span> Generous Luggage Space</li>
+                <li><span>✔</span> Dual Air Conditioning</li>
+                <li><span>✔</span> GPS Tracked & Clean</li>
+              </ul>
+              <button class="btn btn-secondary btn-full" (click)="selectCar('Ertiga')">Select for Inquiry</button>
             </div>
           </div>
         </div>
@@ -217,6 +236,7 @@ import { Component, OnInit } from '@angular/core';
                 <select class="form-control" name="carPreference" [(ngModel)]="inquiryForm.carPreference">
                   <option value="Swift Dzire">Maruti Swift Dzire (Sedan)</option>
                   <option value="Hyundai Aura">Hyundai Aura (Sedan)</option>
+                  <option value="Ertiga">Maruti Suzuki Ertiga (MUV)</option>
                   <option value="Any Sedan">Any Sedan (Comfort class)</option>
                 </select>
               </div>
@@ -224,18 +244,20 @@ import { Component, OnInit } from '@angular/core';
                 <label class="form-label">Requirement Details</label>
                 <textarea class="form-control" name="notes" [(ngModel)]="inquiryForm.notes" rows="3" placeholder="e.g. Airport pick up tomorrow at 8 AM, or corporate fleet requirement..."></textarea>
               </div>
-              <button type="submit" class="btn btn-primary btn-full">SUBMIT ENQUIRY</button>
+              <button type="submit" class="btn btn-primary btn-full" [disabled]="isInquirySubmitting">
+                {{ isInquirySubmitting ? 'SUBMITTING...' : 'SUBMIT ENQUIRY' }}
+              </button>
             </form>
           </div>
         </div>
       </section>
 
       <!-- Outstation Inquiry Modal Dialog (AdvantageGo Theme: Light modal body) -->
-      <div class="modal-overlay" *ngIf="isOutstationModalOpen" (click)="closeOutstationModal()">
+      <div class="modal-overlay" *ngIf="isOutstationModalOpen" (click)="!isOutstationSubmitting && closeOutstationModal()">
         <div class="modal-content-scroll" (click)="$event.stopPropagation()">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; border-bottom:2px solid var(--primary); padding-bottom:1rem;">
             <h3 style="margin:0; color:var(--primary); font-size:1.5rem;">Plan Outstation Trip</h3>
-            <button (click)="closeOutstationModal()" style="background:none; border:none; font-size:2rem; cursor:pointer; color:var(--text-muted); line-height: 0.5;">&times;</button>
+            <button (click)="closeOutstationModal()" [disabled]="isOutstationSubmitting" style="background:none; border:none; font-size:2rem; cursor:pointer; color:var(--text-muted); line-height: 0.5;">&times;</button>
           </div>
 
           <div *ngIf="outstationSubmitted" class="badge badge-success success-alert" style="margin-bottom:1.5rem; width:100%; box-sizing:border-box;">
@@ -297,6 +319,7 @@ import { Component, OnInit } from '@angular/core';
                 <select class="form-control" name="oCar" [(ngModel)]="outstationForm.carPreference">
                   <option value="Swift Dzire">Maruti Swift Dzire (Sedan)</option>
                   <option value="Hyundai Aura">Hyundai Aura (Sedan)</option>
+                  <option value="Ertiga">Maruti Suzuki Ertiga (MUV)</option>
                   <option value="Any Sedan">Any Sedan (Comfort class)</option>
                 </select>
               </div>
@@ -311,8 +334,10 @@ import { Component, OnInit } from '@angular/core';
             </div>
 
             <div style="margin-top:1.5rem; display:flex; justify-content:flex-end; gap:1rem; border-top:1px solid var(--border-color); padding-top:1.5rem;">
-              <button type="button" class="btn btn-secondary" (click)="closeOutstationModal()">Cancel</button>
-              <button type="submit" class="btn btn-primary">Submit Query</button>
+              <button type="button" class="btn btn-secondary" (click)="closeOutstationModal()" [disabled]="isOutstationSubmitting">Cancel</button>
+              <button type="submit" class="btn btn-primary" [disabled]="isOutstationSubmitting">
+                {{ isOutstationSubmitting ? 'SUBMITTING...' : 'Submit Query' }}
+              </button>
             </div>
           </form>
         </div>
@@ -727,9 +752,9 @@ import { Component, OnInit } from '@angular/core';
 
     .fleet-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 2.5rem;
-      max-width: 1000px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      max-width: 1200px;
       margin: 0 auto;
     }
 
@@ -1181,8 +1206,10 @@ import { Component, OnInit } from '@angular/core';
 export class HomeComponent implements OnInit {
   isMenuOpen = false;
   inquirySubmitted = false;
+  isInquirySubmitting = false;
   isOutstationModalOpen = false;
   outstationSubmitted = false;
+  isOutstationSubmitting = false;
 
   inquiryForm = {
     name: '',
@@ -1203,6 +1230,8 @@ export class HomeComponent implements OnInit {
     carPreference: 'Any Sedan',
     remarks: ''
   };
+
+  constructor(private apiService: ApiService) {}
 
   ngOnInit(): void {
     // Initial load logic
@@ -1246,6 +1275,7 @@ export class HomeComponent implements OnInit {
   }
 
   closeOutstationModal() {
+    if (this.isOutstationSubmitting) return;
     this.isOutstationModalOpen = false;
     this.outstationSubmitted = false;
     this.outstationForm = {
@@ -1269,33 +1299,34 @@ export class HomeComponent implements OnInit {
       return;
     }
     
-    // Save to local storage for the Admin Panel inquiries view
-    const current = JSON.parse(localStorage.getItem('general_inquiries') || '[]');
-    const newInquiry = {
-      id: Date.now(),
+    this.isInquirySubmitting = true;
+    this.apiService.createGeneralInquiry({
       name: this.inquiryForm.name,
       phone: this.inquiryForm.phone,
       carPreference: this.inquiryForm.carPreference,
-      notes: this.inquiryForm.notes,
-      date: new Date().toISOString(),
-      status: 'New'
-    };
-    current.push(newInquiry);
-    localStorage.setItem('general_inquiries', JSON.stringify(current));
-
-    console.log('[Inquiry Submitted]', newInquiry);
-    this.inquirySubmitted = true;
-    
-    // Reset form after delay
-    setTimeout(() => {
-      this.inquirySubmitted = false;
-      this.inquiryForm = {
-        name: '',
-        phone: '',
-        carPreference: 'Any Sedan',
-        notes: ''
-      };
-    }, 5000);
+      notes: this.inquiryForm.notes
+    }).subscribe({
+      next: (res) => {
+        console.log('[Inquiry Submitted]', res);
+        this.inquirySubmitted = true;
+        this.isInquirySubmitting = false;
+        
+        setTimeout(() => {
+          this.inquirySubmitted = false;
+          this.inquiryForm = {
+            name: '',
+            phone: '',
+            carPreference: 'Any Sedan',
+            notes: ''
+          };
+        }, 5000);
+      },
+      error: (err) => {
+        console.error('Failed to submit inquiry:', err);
+        this.isInquirySubmitting = false;
+        alert('Something went wrong. Please try again later.');
+      }
+    });
   }
 
   submitOutstationQuery(event: Event) {
@@ -1305,32 +1336,33 @@ export class HomeComponent implements OnInit {
       return;
     }
 
-    // Save to local storage for the Admin Panel outstation requests view
-    const current = JSON.parse(localStorage.getItem('outstation_queries') || '[]');
-    const newQuery = {
-      id: Date.now(),
+    this.isOutstationSubmitting = true;
+    this.apiService.createOutstationInquiry({
       name: this.outstationForm.name,
       phone: this.outstationForm.phone,
       tripType: this.outstationForm.tripType,
       pickupLocation: this.outstationForm.pickupLocation,
       dropLocation: this.outstationForm.dropLocation,
-      checkinDateTime: this.outstationForm.checkinDateTime,
-      checkoutDateTime: this.outstationForm.tripType === 'Round Trip' ? this.outstationForm.checkoutDateTime : '',
+      checkinDateTime: this.outstationForm.checkinDateTime ? new Date(this.outstationForm.checkinDateTime).toISOString() : null,
+      checkoutDateTime: (this.outstationForm.tripType === 'Round Trip' && this.outstationForm.checkoutDateTime) ? new Date(this.outstationForm.checkoutDateTime).toISOString() : null,
       passengerCount: this.outstationForm.passengerCount,
       carPreference: this.outstationForm.carPreference,
-      remarks: this.outstationForm.remarks,
-      date: new Date().toISOString(),
-      status: 'New'
-    };
-    current.push(newQuery);
-    localStorage.setItem('outstation_queries', JSON.stringify(current));
+      remarks: this.outstationForm.remarks
+    }).subscribe({
+      next: (res) => {
+        console.log('[Outstation Query Submitted]', res);
+        this.outstationSubmitted = true;
+        this.isOutstationSubmitting = false;
 
-    console.log('[Outstation Query Submitted]', newQuery);
-    this.outstationSubmitted = true;
-
-    // Close modal after brief delay
-    setTimeout(() => {
-      this.closeOutstationModal();
-    }, 4000);
+        setTimeout(() => {
+          this.closeOutstationModal();
+        }, 4000);
+      },
+      error: (err) => {
+        console.error('Failed to submit outstation query:', err);
+        this.isOutstationSubmitting = false;
+        alert('Something went wrong. Please try again later.');
+      }
+    });
   }
 }

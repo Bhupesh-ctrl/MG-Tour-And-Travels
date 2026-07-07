@@ -34,6 +34,9 @@ import { ToastService } from '../../../core/services/toast.service';
               <th>Route</th>
               <th>Start Time</th>
               <th>End Time</th>
+              <th>Route Type</th>
+              <th>Guard</th>
+              <th>Toll</th>
               <th>Odometer (Start ➜ End)</th>
               <th>Financials</th>
               <th>Status</th>
@@ -60,6 +63,23 @@ import { ToastService } from '../../../core/services/toast.service';
                 <input type="text" class="form-control" style="padding: 0.35rem 0.5rem; font-size: 0.8rem; height: auto;" placeholder="Filter End..." [(ngModel)]="filters.endTime" (input)="applyFilters()" />
               </td>
               <td>
+                <input type="text" class="form-control" style="padding: 0.35rem 0.5rem; font-size: 0.8rem; height: auto;" placeholder="Filter Type..." [(ngModel)]="filters.routeType" (input)="applyFilters()" />
+              </td>
+              <td>
+                <select class="form-control" style="padding: 0.35rem 0.5rem; font-size: 0.8rem; height: auto;" [(ngModel)]="filters.guard" (change)="applyFilters()">
+                  <option value="">All</option>
+                  <option value="Yes">Yes</option>
+                  <option value="No">No</option>
+                </select>
+              </td>
+              <td>
+                <select class="form-control" style="padding: 0.35rem 0.5rem; font-size: 0.8rem; height: auto;" [(ngModel)]="filters.toll" (change)="applyFilters()">
+                  <option value="">All</option>
+                  <option value="Yes">Yes</option>
+                  <option value="No">No</option>
+                </select>
+              </td>
+              <td>
                 <input type="text" class="form-control" style="padding: 0.35rem 0.5rem; font-size: 0.8rem; height: auto;" placeholder="Filter Odo..." [(ngModel)]="filters.odometer" (input)="applyFilters()" />
               </td>
               <td>
@@ -79,7 +99,7 @@ import { ToastService } from '../../../core/services/toast.service';
           </thead>
           <tbody>
             <tr *ngIf="trips.length === 0">
-              <td colspan="10" style="text-align: center; color: var(--text-muted); padding: 3rem;">
+              <td colspan="13" style="text-align: center; color: var(--text-muted); padding: 3rem;">
                 No trips matching search filters.
               </td>
             </tr>
@@ -93,6 +113,17 @@ import { ToastService } from '../../../core/services/toast.service';
               </td>
               <td>{{ trip.startTime | date:'short' }}</td>
               <td>{{ trip.endTime ? (trip.endTime | date:'short') : 'Ongoing...' }}</td>
+              <td>{{ trip.routeType }}</td>
+              <td>
+                <span class="badge" [class.badge-success]="trip.isGuardRoute" [class.badge-info]="!trip.isGuardRoute">
+                  {{ trip.isGuardRoute ? 'Yes' : 'No' }}
+                </span>
+              </td>
+              <td>
+                <span class="badge" [class.badge-success]="trip.isTollRoute" [class.badge-info]="!trip.isTollRoute">
+                  {{ trip.isTollRoute ? 'Yes' : 'No' }}
+                </span>
+              </td>
               <td>
                 {{ trip.startOdometer }} ➜ {{ trip.endOdometer || '...' }}
                 <div style="font-size: 0.75rem; color: var(--text-secondary);" *ngIf="trip.endOdometer">
@@ -219,6 +250,34 @@ import { ToastService } from '../../../core/services/toast.service';
 
           <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
             <div class="form-group">
+              <label class="form-label">Guard Route</label>
+              <select class="form-control" [(ngModel)]="tripForm.isGuardRoute">
+                <option [ngValue]="true">Yes</option>
+                <option [ngValue]="false">No</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Route Type</label>
+              <select class="form-control" [(ngModel)]="tripForm.routeType">
+                <option value="Gurgaon">Gurgaon</option>
+                <option value="Delhi">Delhi</option>
+                <option value="Faridabad">Faridabad</option>
+                <option value="Manesar">Manesar</option>
+                <option value="Noida">Noida</option>
+                <option value="Ghaziabad">Ghaziabad</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Toll Route</label>
+              <select class="form-control" [(ngModel)]="tripForm.isTollRoute">
+                <option [ngValue]="true">Yes</option>
+                <option [ngValue]="false">No</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
               <label class="form-label">Fare Amount (₹)</label>
               <input type="number" class="form-control" [(ngModel)]="tripForm.fareAmount" placeholder="0.00" />
             </div>
@@ -261,6 +320,9 @@ export class TripManagementComponent implements OnInit {
     route: '',
     startTime: '',
     endTime: '',
+    routeType: '',
+    guard: '',
+    toll: '',
     odometer: '',
     financials: '',
     status: ''
@@ -293,7 +355,10 @@ export class TripManagementComponent implements OnInit {
     fareAmount: null as number | null,
     tollAmount: null as number | null,
     notes: '',
-    vendorTripId: null as number | null
+    vendorTripId: null as number | null,
+    isGuardRoute: false,
+    routeType: 'Gurgaon',
+    isTollRoute: false
   };
 
   constructor(private apiService: ApiService, private toast: ToastService) {}
@@ -354,6 +419,16 @@ export class TripManagementComponent implements OnInit {
                          new Date(trip.endTime).toLocaleTimeString().toLowerCase().includes(this.filters.endTime.toLowerCase()))
                       : 'ongoing'.includes(this.filters.endTime.toLowerCase()));
 
+      const matchRouteType = !this.filters.routeType || (trip.routeType && trip.routeType.toLowerCase().includes(this.filters.routeType.toLowerCase()));
+
+      const matchGuard = !this.filters.guard || 
+        (this.filters.guard === 'Yes' && trip.isGuardRoute) || 
+        (this.filters.guard === 'No' && !trip.isGuardRoute);
+
+      const matchToll = !this.filters.toll || 
+        (this.filters.toll === 'Yes' && trip.isTollRoute) || 
+        (this.filters.toll === 'No' && !trip.isTollRoute);
+
       const matchOdo = !this.filters.odometer || 
         trip.startOdometer.toString().includes(this.filters.odometer) ||
         (trip.endOdometer && trip.endOdometer.toString().includes(this.filters.odometer));
@@ -365,7 +440,9 @@ export class TripManagementComponent implements OnInit {
       let statusLabel = this.getStatusLabel(trip.status);
       const matchStatus = !this.filters.status || statusLabel.toLowerCase() === this.filters.status.toLowerCase();
 
-      return matchId && matchVehicle && matchDriver && matchRoute && matchStart && matchEnd && matchOdo && matchFinancials && matchStatus;
+      return matchId && matchVehicle && matchDriver && matchRoute && matchStart && matchEnd && 
+        matchRouteType && matchGuard && matchToll &&
+        matchOdo && matchFinancials && matchStatus;
     });
 
     this.totalCount = this.filteredTrips.length;
@@ -428,7 +505,10 @@ export class TripManagementComponent implements OnInit {
       fareAmount: trip.fareAmount,
       tollAmount: trip.tollAmount,
       notes: trip.notes || '',
-      vendorTripId: trip.vendorTripId
+      vendorTripId: trip.vendorTripId,
+      isGuardRoute: trip.isGuardRoute || false,
+      routeType: trip.routeType || 'Gurgaon',
+      isTollRoute: trip.isTollRoute || false
     };
     this.showEditModal = true;
   }
@@ -475,7 +555,10 @@ export class TripManagementComponent implements OnInit {
       fuelConsumed: this.tripForm.fuelConsumed ? parseFloat(this.tripForm.fuelConsumed.toString()) : null,
       fareAmount: this.tripForm.fareAmount ? parseFloat(this.tripForm.fareAmount.toString()) : null,
       tollAmount: this.tripForm.tollAmount ? parseFloat(this.tripForm.tollAmount.toString()) : null,
-      notes: this.tripForm.notes
+      notes: this.tripForm.notes,
+      isGuardRoute: this.tripForm.isGuardRoute,
+      routeType: this.tripForm.routeType,
+      isTollRoute: this.tripForm.isTollRoute
     };
 
     if (this.editingTripId) {

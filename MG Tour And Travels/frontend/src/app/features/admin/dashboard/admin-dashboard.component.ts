@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { ApiService } from '../../../core/services/api.service';
 import { forkJoin } from 'rxjs';
 
@@ -12,19 +12,35 @@ import { forkJoin } from 'rxjs';
       </div>
 
       <!-- Filters & Export Header Toolbar -->
-      <div class="glass-card filters-toolbar" style="margin-bottom: 2rem; padding: 1.25rem 1.5rem; display: flex; gap: 1rem; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+      <div class="glass-card filters-toolbar" style="margin-bottom: 2rem; padding: 1.25rem 1.5rem; display: flex; gap: 1rem; align-items: center; justify-content: space-between; flex-wrap: wrap; position: relative; z-index: 1001;">
         <div style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap;">
-          <!-- Date Filter -->
-          <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+          <!-- Date Filter (Custom Dropdown) -->
+          <div style="display: flex; flex-direction: column; gap: 0.25rem; position: relative;">
             <span class="form-label" style="font-size: 0.75rem; margin: 0; font-weight:700;">Date Range</span>
-            <select class="form-control" style="width: 160px;" [(ngModel)]="dateFilter" (change)="onFilterChange()">
-              <option value="all">All Time</option>
-              <option value="1day">1 Day (Today)</option>
-              <option value="1week">1 Week</option>
-              <option value="1month">1 Month</option>
-              <option value="1year">1 Year</option>
-              <option value="custom">Custom Date Range</option>
-            </select>
+            <div 
+              class="form-control" 
+              style="width: 170px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: rgba(197, 155, 39, 0.02); border: 1px solid var(--border-color); color: var(--text-primary); padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.95rem; box-sizing: border-box; height: 45px;"
+              (click)="toggleDateDropdown($event)"
+            >
+              <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 130px;">
+                {{ getDateFilterLabel() }}
+              </span>
+              <span style="font-size: 0.7rem; color: var(--primary);">▼</span>
+            </div>
+
+            <div 
+              *ngIf="isDateDropdownOpen" 
+              class="glass-card" 
+              style="position: absolute; top: 100%; left: 0; width: 180px; z-index: 1000; padding: 0.5rem; background: #121212; border: 1px solid var(--primary); margin-top: 0.25rem; display: flex; flex-direction: column; gap: 0.25rem; box-shadow: 0 4px 20px rgba(0,0,0,0.5);"
+              (click)="$event.stopPropagation()"
+            >
+              <div (click)="setDateFilter('all')" [style.background]="dateFilter === 'all' ? 'rgba(197,155,39,0.15)' : (hoveredDateOpt === 'all' ? 'rgba(255,255,255,0.05)' : 'transparent')" [style.color]="dateFilter === 'all' ? 'var(--primary)' : '#dfddd9'" (mouseenter)="hoveredDateOpt = 'all'" (mouseleave)="hoveredDateOpt = ''" style="padding: 0.5rem 0.75rem; cursor: pointer; border-radius: 4px; font-size: 0.875rem; font-weight: 600; transition: background 0.2s;">All Time</div>
+              <div (click)="setDateFilter('1day')" [style.background]="dateFilter === '1day' ? 'rgba(197,155,39,0.15)' : (hoveredDateOpt === '1day' ? 'rgba(255,255,255,0.05)' : 'transparent')" [style.color]="dateFilter === '1day' ? 'var(--primary)' : '#dfddd9'" (mouseenter)="hoveredDateOpt = '1day'" (mouseleave)="hoveredDateOpt = ''" style="padding: 0.5rem 0.75rem; cursor: pointer; border-radius: 4px; font-size: 0.875rem; font-weight: 600; transition: background 0.2s;">1 Day (Today)</div>
+              <div (click)="setDateFilter('1week')" [style.background]="dateFilter === '1week' ? 'rgba(197,155,39,0.15)' : (hoveredDateOpt === '1week' ? 'rgba(255,255,255,0.05)' : 'transparent')" [style.color]="dateFilter === '1week' ? 'var(--primary)' : '#dfddd9'" (mouseenter)="hoveredDateOpt = '1week'" (mouseleave)="hoveredDateOpt = ''" style="padding: 0.5rem 0.75rem; cursor: pointer; border-radius: 4px; font-size: 0.875rem; font-weight: 600; transition: background 0.2s;">1 Week</div>
+              <div (click)="setDateFilter('1month')" [style.background]="dateFilter === '1month' ? 'rgba(197,155,39,0.15)' : (hoveredDateOpt === '1month' ? 'rgba(255,255,255,0.05)' : 'transparent')" [style.color]="dateFilter === '1month' ? 'var(--primary)' : '#dfddd9'" (mouseenter)="hoveredDateOpt = '1month'" (mouseleave)="hoveredDateOpt = ''" style="padding: 0.5rem 0.75rem; cursor: pointer; border-radius: 4px; font-size: 0.875rem; font-weight: 600; transition: background 0.2s;">1 Month</div>
+              <div (click)="setDateFilter('1year')" [style.background]="dateFilter === '1year' ? 'rgba(197,155,39,0.15)' : (hoveredDateOpt === '1year' ? 'rgba(255,255,255,0.05)' : 'transparent')" [style.color]="dateFilter === '1year' ? 'var(--primary)' : '#dfddd9'" (mouseenter)="hoveredDateOpt = '1year'" (mouseleave)="hoveredDateOpt = ''" style="padding: 0.5rem 0.75rem; cursor: pointer; border-radius: 4px; font-size: 0.875rem; font-weight: 600; transition: background 0.2s;">1 Year</div>
+              <div (click)="setDateFilter('custom')" [style.background]="dateFilter === 'custom' ? 'rgba(197,155,39,0.15)' : (hoveredDateOpt === 'custom' ? 'rgba(255,255,255,0.05)' : 'transparent')" [style.color]="dateFilter === 'custom' ? 'var(--primary)' : '#dfddd9'" (mouseenter)="hoveredDateOpt = 'custom'" (mouseleave)="hoveredDateOpt = ''" style="padding: 0.5rem 0.75rem; cursor: pointer; border-radius: 4px; font-size: 0.875rem; font-weight: 600; transition: background 0.2s;">Custom Date Range</div>
+            </div>
           </div>
           
           <!-- Custom Dates Picker -->
@@ -39,15 +55,51 @@ import { forkJoin } from 'rxjs';
             </div>
           </div>
 
-          <!-- Cab Filter -->
-          <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+          <!-- Cab Filter (Multi-Select) -->
+          <div style="display: flex; flex-direction: column; gap: 0.25rem; position: relative;">
             <span class="form-label" style="font-size: 0.75rem; margin: 0; font-weight:700;">Filter by Vehicle</span>
-            <select class="form-control" style="width: 180px;" [(ngModel)]="selectedCabFilter" (change)="onFilterChange()">
-              <option value="all">All Cabs</option>
-              <option *ngFor="let cab of cabsList" [value]="cab.vehicleNumber">
-                {{ cab.vehicleNumber | uppercase }}
-              </option>
-            </select>
+            <div 
+              class="form-control" 
+              style="width: 220px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: rgba(197, 155, 39, 0.02); border: 1px solid var(--border-color); color: var(--text-primary); padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.95rem; box-sizing: border-box; height: 45px;"
+              (click)="toggleCabDropdown($event)"
+            >
+              <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 180px;">
+                {{ getSelectedCabsLabel() }}
+              </span>
+              <span style="font-size: 0.7rem; color: var(--primary);">▼</span>
+            </div>
+
+            <div 
+              *ngIf="isCabDropdownOpen" 
+              class="glass-card" 
+              style="position: absolute; top: 100%; left: 0; width: 250px; max-height: 250px; overflow-y: auto; z-index: 1000; padding: 0.75rem; background: #121212; border: 1px solid var(--primary); margin-top: 0.25rem; display: flex; flex-direction: column; gap: 0.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.5);"
+              (click)="$event.stopPropagation()"
+            >
+              <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: #ffffff; font-size: 0.85rem; padding: 0.25rem; margin: 0;">
+                <input 
+                  type="checkbox" 
+                  [checked]="isAllCabsSelected()" 
+                  (change)="toggleSelectAllCabs($event)" 
+                  style="cursor: pointer;"
+                />
+                <strong>All Cabs</strong>
+              </label>
+              
+              <hr style="margin: 0.25rem 0; border: none; border-top: 1px solid rgba(255, 255, 255, 0.1);" />
+
+              <label 
+                *ngFor="let cab of cabsList" 
+                style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: #dfddd9; font-size: 0.85rem; padding: 0.25rem; margin: 0;"
+              >
+                <input 
+                  type="checkbox" 
+                  [checked]="isCabSelectedInFilter(cab.vehicleNumber || cab.VehicleNumber)" 
+                  (change)="toggleCabSelection(cab.vehicleNumber || cab.VehicleNumber, $event)" 
+                  style="cursor: pointer;"
+                />
+                {{ (cab.vehicleNumber || cab.VehicleNumber) | uppercase }}
+              </label>
+            </div>
           </div>
         </div>
 
@@ -378,7 +430,6 @@ import { forkJoin } from 'rxjs';
                   <strong style="color: var(--text-primary); text-transform: uppercase;">{{ $any(cab).vehicleNumber }}</strong>
                   <div style="font-size: 0.8rem; color: var(--text-secondary);">{{ $any(cab).tripCount }} Trips completed</div>
                 </div>
-                <span style="color: var(--primary); font-weight: 700;">{{ $any(cab).earnings | currency }}</span>
               </div>
             </div>
 
@@ -392,7 +443,6 @@ import { forkJoin } from 'rxjs';
                   <strong style="color: var(--text-primary); text-transform: uppercase;">{{ $any(cab).vehicleNumber }}</strong>
                   <div style="font-size: 0.8rem; color: var(--text-secondary);">{{ $any(cab).tripCount }} Trips | {{ $any(cab).make }} {{ $any(cab).model }}</div>
                 </div>
-                <span style="color: var(--danger); font-weight: 700;">{{ $any(cab).earnings | currency }}</span>
               </div>
             </div>
           </div>
@@ -402,12 +452,12 @@ import { forkJoin } from 'rxjs';
             <div class="glass-card" style="padding: 0.6rem 0.75rem; border-color: rgba(36,161,72,0.25); background: rgba(36,161,72,0.02); text-align: center; border-radius: 8px;">
               <div style="font-size: 0.7rem; text-transform: uppercase; color: var(--text-secondary);">Best Cab</div>
               <strong style="color: var(--success); text-transform: uppercase; font-size: 0.8rem;">{{ bestPerformingCab }}</strong>
-              <div style="font-size: 0.85rem; font-weight:700; color:var(--text-primary);">{{ bestPerformingCabEarnings | currency }}</div>
+              <div style="font-size: 0.85rem; font-weight:700; color:var(--text-primary);">{{ bestPerformingCabTrips }} Trips</div>
             </div>
             <div class="glass-card" style="padding: 0.6rem 0.75rem; border-color: rgba(218,30,40,0.25); background: rgba(218,30,40,0.02); text-align: center; border-radius: 8px;">
               <div style="font-size: 0.7rem; text-transform: uppercase; color: var(--text-secondary);">Lowest Cab</div>
               <strong style="color: var(--danger); text-transform: uppercase; font-size: 0.8rem;">{{ lowestPerformingCab }}</strong>
-              <div style="font-size: 0.85rem; font-weight:700; color:var(--text-primary);">{{ lowestPerformingCabEarnings | currency }}</div>
+              <div style="font-size: 0.85rem; font-weight:700; color:var(--text-primary);">{{ lowestPerformingCabTrips }} Trips</div>
             </div>
           </div>
         </div>
@@ -543,8 +593,8 @@ import { forkJoin } from 'rxjs';
                   <span style="font-weight: 600; color: #dfddd9;">{{ getCategoryName(cat.key) }}</span>
                   <span style="color: #ffffff;">{{ cat.value | currency }} ({{ (cat.value / (totalExpensesFiltered || 1)) * 100 | number:'1.0-0' }}%)</span>
                 </div>
-                <div style="background: rgba(197, 155, 39, 0.15); height: 5px; border-radius: 4px;">
-                  <div [style.width.%]="(cat.value / (totalExpensesFiltered || 1)) * 100" style="background: var(--primary); height: 5px; border-radius: 4px;"></div>
+                <div style="background: rgba(197, 155, 39, 0.15); height: 5px; border-radius: 4px; overflow: hidden;">
+                  <div [style.width.%]="(cat.value / (totalExpensesFiltered || 1)) * 100" style="background: var(--primary); height: 5px; border-radius: 4px; max-width: 100%;"></div>
                 </div>
               </div>
             </div>
@@ -1000,7 +1050,7 @@ export class AdminDashboardComponent implements OnInit {
   dateFilter = 'all';
   startDate = '';
   endDate = '';
-  selectedCabFilter = 'all';
+  selectedCabFilter: string[] = ['all'];
 
   // Base datasets
   cabsList: any[] = [];
@@ -1023,8 +1073,10 @@ export class AdminDashboardComponent implements OnInit {
   routeCompletionRate = 0;
   bestPerformingCab = 'N/A';
   bestPerformingCabEarnings = 0;
+  bestPerformingCabTrips = 0;
   lowestPerformingCab = 'N/A';
   lowestPerformingCabEarnings = 0;
+  lowestPerformingCabTrips = 0;
 
   // Visual chart types toggling
   activeChartType: 'cashflow' | 'daily' | 'expense' | 'trends' | 'route' = 'cashflow';
@@ -1130,8 +1182,10 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
-  onFilterChange() {
-    // 1. Identify start/end dates
+  checkDate(dateStr: string): boolean {
+    if (!dateStr) return false;
+    const d = new Date(dateStr);
+    
     let start: Date | null = null;
     let end: Date | null = null;
     const now = new Date();
@@ -1161,35 +1215,33 @@ export class AdminDashboardComponent implements OnInit {
       }
     }
 
-    const checkDate = (dateStr: string) => {
-      if (!dateStr) return false;
-      const d = new Date(dateStr);
-      if (start && d < start) return false;
-      if (end && d > end) return false;
-      return true;
-    };
+    if (start && d < start) return false;
+    if (end && d > end) return false;
+    return true;
+  }
 
+  onFilterChange() {
     // 2. Filter lists
     const cabFilter = this.selectedCabFilter;
     
     // Filter Revenues
     this.filteredRevenue = this.revenueList.filter((r: any) => {
-      return checkDate(r.date) && (cabFilter === 'all' || r.vehicleNumber === cabFilter);
+      return this.checkDate(r.date) && (cabFilter.includes('all') || cabFilter.includes(r.vehicleNumber));
     });
 
     // Filter Expenses
     this.filteredExpenses = this.expensesList.filter((e: any) => {
-      return checkDate(e.date) && (cabFilter === 'all' || e.cabVehicleNumber === cabFilter);
+      return this.checkDate(e.date) && (cabFilter.includes('all') || cabFilter.includes(e.cabVehicleNumber));
     });
 
     // Filter Trips
     this.filteredTrips = this.tripsList.filter((t: any) => {
-      return checkDate(t.startTime) && (cabFilter === 'all' || t.vehicleNumber === cabFilter);
+      return this.checkDate(t.startTime) && (cabFilter.includes('all') || cabFilter.includes(t.vehicleNumber));
     });
 
     // Filter Cabs
     this.filteredCabs = this.cabsList.filter((c: any) => {
-      return cabFilter === 'all' || c.vehicleNumber === cabFilter;
+      return cabFilter.includes('all') || cabFilter.includes(c.vehicleNumber);
     });
 
     // 3. Recalculate KPIs
@@ -1211,7 +1263,7 @@ export class AdminDashboardComponent implements OnInit {
 
     // Target completion rate
     const driverNamesForCabs = new Set(this.filteredCabs.map((c: any) => c.assignedDriverName));
-    const targetSubset = this.targetsList.filter((t: any) => cabFilter === 'all' || driverNamesForCabs.has(t.driverName));
+    const targetSubset = this.targetsList.filter((t: any) => cabFilter.includes('all') || driverNamesForCabs.has(t.driverName));
     let totalTarget = 0;
     let totalCompleted = 0;
     targetSubset.forEach((t: any) => {
@@ -1228,51 +1280,39 @@ export class AdminDashboardComponent implements OnInit {
     const totalTripsForCompletion = completedTripsCount + cancelledTripsCount;
     this.routeCompletionRate = totalTripsForCompletion > 0 ? Math.round((completedTripsCount / totalTripsForCompletion) * 100) : 0;
 
-    // 4. Cab Performance (Best vs Lowest)
-    const cabEarningsMap = new Map<string, number>();
-    const cabExpensesMap = new Map<string, number>();
-    
-    this.cabsList.forEach((cab: any) => {
-      cabEarningsMap.set(cab.vehicleNumber, 0);
-      cabExpensesMap.set(cab.vehicleNumber, 0);
+    // 4. Cab Performance (Best vs Lowest based on Trips Completed)
+    const cabPerformanceList = this.cabsList.map((cab: any) => {
+      const tripCount = this.filteredTrips.filter((t: any) => {
+        const vNum = t.vehicleNumber || '';
+        const cabVNum = cab.vehicleNumber || cab.VehicleNumber || '';
+        return vNum.toLowerCase().trim() === cabVNum.toLowerCase().trim() && t.status === 2;
+      }).length;
+      return {
+        vehicleNumber: cab.vehicleNumber || cab.VehicleNumber,
+        make: cab.make,
+        model: cab.model,
+        tripCount: tripCount
+      };
     });
 
-    this.filteredRevenue.forEach((r: any) => {
-      if (r.vehicleNumber) {
-        cabEarningsMap.set(r.vehicleNumber, (cabEarningsMap.get(r.vehicleNumber) || 0) + r.amount);
-      }
-    });
+    if (this.analytics) {
+      this.analytics.cabUtilizations = [...cabPerformanceList].sort((a: any, b: any) => b.tripCount - a.tripCount);
+      this.analytics.leastPerformingCabs = [...cabPerformanceList].sort((a: any, b: any) => a.tripCount - b.tripCount);
+    }
 
-    this.filteredExpenses.forEach((e: any) => {
-      if (e.cabVehicleNumber) {
-        cabExpensesMap.set(e.cabVehicleNumber, (cabExpensesMap.get(e.cabVehicleNumber) || 0) + e.amount);
-      }
-    });
+    this.bestPerformingCab = this.analytics && this.analytics.cabUtilizations?.length > 0 
+      ? this.analytics.cabUtilizations[0].vehicleNumber 
+      : 'N/A';
+    this.bestPerformingCabTrips = this.analytics && this.analytics.cabUtilizations?.length > 0 
+      ? this.analytics.cabUtilizations[0].tripCount 
+      : 0;
 
-    let bestCab = 'N/A';
-    let bestNetProfit = -9999999;
-    let lowestCab = 'N/A';
-    let lowestNetProfit = 9999999;
-
-    this.cabsList.forEach((cab: any) => {
-      const earn = cabEarningsMap.get(cab.vehicleNumber) || 0;
-      const exp = cabExpensesMap.get(cab.vehicleNumber) || 0;
-      const profit = earn - exp - (cab.driverSalary || 0);
-
-      if (profit > bestNetProfit) {
-        bestNetProfit = profit;
-        bestCab = cab.vehicleNumber;
-      }
-      if (profit < lowestNetProfit) {
-        lowestNetProfit = profit;
-        lowestCab = cab.vehicleNumber;
-      }
-    });
-
-    this.bestPerformingCab = bestCab;
-    this.bestPerformingCabEarnings = bestNetProfit;
-    this.lowestPerformingCab = lowestCab;
-    this.lowestPerformingCabEarnings = lowestNetProfit;
+    this.lowestPerformingCab = this.analytics && this.analytics.leastPerformingCabs?.length > 0 
+      ? this.analytics.leastPerformingCabs[0].vehicleNumber 
+      : 'N/A';
+    this.lowestPerformingCabTrips = this.analytics && this.analytics.leastPerformingCabs?.length > 0 
+      ? this.analytics.leastPerformingCabs[0].tripCount 
+      : 0;
 
     // 5. Trigger detail updates
     this.filterRevenue();
@@ -1292,7 +1332,95 @@ export class AdminDashboardComponent implements OnInit {
     this.dateFilter = 'all';
     this.startDate = '';
     this.endDate = '';
-    this.selectedCabFilter = 'all';
+    this.selectedCabFilter = ['all'];
+    this.onFilterChange();
+  }
+
+  isCabDropdownOpen = false;
+  isDateDropdownOpen = false;
+  hoveredDateOpt = '';
+
+  toggleCabDropdown(event: Event) {
+    event.stopPropagation();
+    this.isCabDropdownOpen = !this.isCabDropdownOpen;
+    this.isDateDropdownOpen = false;
+  }
+
+  toggleDateDropdown(event: Event) {
+    event.stopPropagation();
+    this.isDateDropdownOpen = !this.isDateDropdownOpen;
+    this.isCabDropdownOpen = false;
+  }
+
+  setDateFilter(value: string) {
+    this.dateFilter = value;
+    this.isDateDropdownOpen = false;
+    this.onFilterChange();
+  }
+
+  getDateFilterLabel(): string {
+    switch (this.dateFilter) {
+      case 'all': return 'All Time';
+      case '1day': return '1 Day (Today)';
+      case '1week': return '1 Week';
+      case '1month': return '1 Month';
+      case '1year': return '1 Year';
+      case 'custom': return 'Custom Date Range';
+      default: return 'All Time';
+    }
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    this.isCabDropdownOpen = false;
+    this.isDateDropdownOpen = false;
+  }
+
+  getSelectedCabsLabel(): string {
+    if (!this.selectedCabFilter || this.selectedCabFilter.includes('all')) {
+      return 'All Cabs';
+    }
+    if (this.selectedCabFilter.length === 0) {
+      return 'No Cabs Selected';
+    }
+    return this.selectedCabFilter.map(c => c.toUpperCase()).join(', ');
+  }
+
+  isAllCabsSelected(): boolean {
+    return this.selectedCabFilter.includes('all');
+  }
+
+  toggleSelectAllCabs(event: any) {
+    if (event.target.checked) {
+      this.selectedCabFilter = ['all'];
+    } else {
+      this.selectedCabFilter = [];
+    }
+    this.onFilterChange();
+  }
+
+  isCabSelectedInFilter(vehicleNumber: string): boolean {
+    return this.selectedCabFilter.includes(vehicleNumber);
+  }
+
+  toggleCabSelection(vehicleNumber: string, event: any) {
+    if (event.target.checked) {
+      const allIndex = this.selectedCabFilter.indexOf('all');
+      if (allIndex > -1) {
+        this.selectedCabFilter.splice(allIndex, 1);
+      }
+      if (!this.selectedCabFilter.includes(vehicleNumber)) {
+        this.selectedCabFilter.push(vehicleNumber);
+      }
+    } else {
+      const idx = this.selectedCabFilter.indexOf(vehicleNumber);
+      if (idx > -1) {
+        this.selectedCabFilter.splice(idx, 1);
+      }
+      if (this.selectedCabFilter.length === 0) {
+        this.selectedCabFilter.push('all');
+      }
+    }
     this.onFilterChange();
   }
 
@@ -1352,25 +1480,28 @@ export class AdminDashboardComponent implements OnInit {
   // --- DETAILS SEARCH & FILTER METHODS ---
   filterRevenue() {
     const term = this.revenueSearch.toLowerCase();
+    const cabFilter = this.selectedCabFilter;
     this.filteredRevenue = this.revenueList.filter((r: any) => {
+      const matchFilter = this.checkDate(r.date) && (cabFilter.includes('all') || cabFilter.includes(r.vehicleNumber));
       const matchSearch = (r.driverName && r.driverName.toLowerCase().includes(term)) ||
         (r.vehicleNumber && r.vehicleNumber.toLowerCase().includes(term)) ||
         (r.description && r.description.toLowerCase().includes(term)) ||
         (r.source && r.source.toLowerCase().includes(term));
-      
-      const inDateRange = this.filteredRevenue.some((fr: any) => fr.id === r.id);
-      return matchSearch;
+      return matchFilter && matchSearch;
     });
   }
 
   filterExpenses() {
     const term = this.expenseSearch.toLowerCase();
+    const cabFilter = this.selectedCabFilter;
     this.filteredExpenses = this.expensesList.filter((e: any) => {
+      const matchFilter = this.checkDate(e.date) && (cabFilter.includes('all') || cabFilter.includes(e.cabVehicleNumber));
       const matchSearch = (e.driverName && e.driverName.toLowerCase().includes(term)) ||
         (e.cabVehicleNumber && e.cabVehicleNumber.toLowerCase().includes(term)) ||
         (e.description && e.description.toLowerCase().includes(term));
-      return matchSearch;
+      return matchFilter && matchSearch;
     });
+    this.calculateExpenseBreakdown();
   }
 
   calculateExpenseBreakdown() {
@@ -1420,7 +1551,7 @@ export class AdminDashboardComponent implements OnInit {
     const term = this.targetsSearch.toLowerCase();
     const driverNamesForCabs = new Set(this.filteredCabs.map((c: any) => c.assignedDriverName));
     this.targetsDetailsFiltered = this.targetsList.filter((t: any) => {
-      const matchesCab = this.selectedCabFilter === 'all' || driverNamesForCabs.has(t.driverName);
+      const matchesCab = this.selectedCabFilter.includes('all') || driverNamesForCabs.has(t.driverName);
       const matchesSearch = t.driverName.toLowerCase().includes(term) || t.month.toLowerCase().includes(term);
       return matchesCab && matchesSearch;
     });
@@ -1465,7 +1596,11 @@ export class AdminDashboardComponent implements OnInit {
         case 1: return 'Maintenance';
         case 2: return 'Tolls';
         case 3: return 'Insurance';
-        case 4: return 'Other';
+        case 4: return 'Challan';
+        case 5: return 'Salary';
+        case 6: return 'Permit';
+        case 7: return 'Accessories';
+        case 8: return 'Other';
         default: return 'Custom';
       }
     }
@@ -1566,8 +1701,8 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   renderMonthlyExpenseChart() {
-    const categories = [0, 1, 2, 3, 4];
-    const sums: { [key: number]: number } = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0 };
+    const categories = [0, 1, 2, 3, 5, 6, 7, 8, 4];
+    const sums: { [key: number]: number } = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0 };
 
     this.filteredExpenses.forEach((e: any) => {
       const cat = typeof e.category === 'number' ? e.category : 4;
@@ -1577,7 +1712,17 @@ export class AdminDashboardComponent implements OnInit {
     const total = Object.values(sums).reduce((a, b) => a + b, 0);
     this.maxExpenseCategoryValue = Math.max(...Object.values(sums), 500);
 
-    const categoriesLabels = ['Fuel / CNG', 'Maintenance', 'Tolls', 'Insurance', 'Other'];
+    const categoriesLabels: { [key: number]: string } = {
+      0: 'Fuel / CNG',
+      1: 'Maintenance',
+      2: 'Tolls',
+      3: 'Insurance',
+      5: 'Challan',
+      6: 'Salary',
+      7: 'Permit',
+      8: 'Accessories',
+      4: 'Other'
+    };
 
     this.expenseCategoryBars = categories.map((cat: number, i: number) => {
       const amount = sums[cat];

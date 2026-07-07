@@ -211,7 +211,10 @@ namespace FleetManagement.API.Controllers
                     StartTime = activeTrip.StartTime,
                     StartOdometer = activeTrip.StartOdometer,
                     StartLocation = activeTrip.StartLocation,
-                    Status = activeTrip.Status
+                    Status = activeTrip.Status,
+                    IsGuardRoute = activeTrip.IsGuardRoute,
+                    RouteType = activeTrip.RouteType,
+                    IsTollRoute = activeTrip.IsTollRoute
                 } : null;
 
                 return Ok(new
@@ -272,7 +275,7 @@ namespace FleetManagement.API.Controllers
                     Category = e.Category.ToString(),
                     Description = e.Description,
                     DriverName = e.Driver != null ? e.Driver.User.Username : "Admin",
-                    CabVehicleNumber = e.Cab.VehicleNumber
+                    CabVehicleNumber = e.Cab != null ? e.Cab.VehicleNumber : null
                 })
                 .ToListAsync();
 

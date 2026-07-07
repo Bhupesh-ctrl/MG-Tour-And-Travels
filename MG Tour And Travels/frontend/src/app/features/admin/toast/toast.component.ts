@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Toast, ToastService } from '../../../core/services/toast.service';
 
@@ -103,10 +103,13 @@ export class ToastComponent implements OnInit, OnDestroy {
   toasts: Toast[] = [];
   private sub!: Subscription;
 
-  constructor(public toastService: ToastService) {}
+  constructor(public toastService: ToastService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
-    this.sub = this.toastService.toasts$.subscribe(t => this.toasts = t);
+    this.sub = this.toastService.toasts$.subscribe(t => {
+      this.toasts = t;
+      this.cdr.detectChanges();
+    });
   }
 
   ngOnDestroy() {

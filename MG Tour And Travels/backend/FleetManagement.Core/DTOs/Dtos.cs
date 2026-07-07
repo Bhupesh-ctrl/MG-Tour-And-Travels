@@ -121,6 +121,9 @@ namespace FleetManagement.Core.DTOs
         public decimal? FareAmount { get; set; }
         public decimal? TollAmount { get; set; }
         public string Notes { get; set; }
+        public bool IsGuardRoute { get; set; }
+        public string RouteType { get; set; }
+        public bool IsTollRoute { get; set; }
     }
 
     public class StartTripDto
@@ -131,6 +134,9 @@ namespace FleetManagement.Core.DTOs
         public string StartLocation { get; set; }
         public string PickupOrDrop { get; set; }
         public string Notes { get; set; }
+        public bool IsGuardRoute { get; set; }
+        public string RouteType { get; set; }
+        public bool IsTollRoute { get; set; }
     }
 
     public class EndTripDto
@@ -161,6 +167,9 @@ namespace FleetManagement.Core.DTOs
         public string PickupOrDrop { get; set; }
         public string Status { get; set; } // "Completed" or "Cancelled"
         public string Notes { get; set; }
+        public bool IsGuardRoute { get; set; }
+        public string RouteType { get; set; }
+        public bool IsTollRoute { get; set; }
     }
 
     // Expense DTOs
@@ -375,6 +384,9 @@ namespace FleetManagement.Core.DTOs
         public decimal? FareAmount { get; set; }
         public decimal? TollAmount { get; set; }
         public string Notes { get; set; }
+        public bool IsGuardRoute { get; set; }
+        public string RouteType { get; set; }
+        public bool IsTollRoute { get; set; }
     }
 
     public class UpdateTargetDto
@@ -387,4 +399,61 @@ namespace FleetManagement.Core.DTOs
         public DateTime EndDate { get; set; }
         public TargetStatus Status { get; set; }
     }
+
+    // Inquiry DTOs
+    public class CreateGeneralInquiryDto
+    {
+        public string Name { get; set; }
+        public string Phone { get; set; }
+        public string CarPreference { get; set; }
+        public string Notes { get; set; }
+    }
+
+    public class CreateOutstationInquiryDto
+    {
+        public string Name { get; set; }
+        public string Phone { get; set; }
+        public string TripType { get; set; }
+        public string PickupLocation { get; set; }
+        public string DropLocation { get; set; }
+        public DateTime? CheckinDateTime { get; set; }
+        public DateTime? CheckoutDateTime { get; set; }
+        public int PassengerCount { get; set; }
+        public string CarPreference { get; set; }
+        public string Remarks { get; set; }
+    }
+
+    public class GeneralInquiryDto
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Phone { get; set; }
+        public string CarPreference { get; set; }
+        public string Notes { get; set; }
+        public DateTime Date { get; set; }
+        public string Status { get; set; }
+    }
+
+    public class OutstationInquiryDto
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Phone { get; set; }
+        public string TripType { get; set; }
+        public string PickupLocation { get; set; }
+        public string DropLocation { get; set; }
+        public DateTime? CheckinDateTime { get; set; }
+        public DateTime? CheckoutDateTime { get; set; }
+        public int PassengerCount { get; set; }
+        public string CarPreference { get; set; }
+        public string Remarks { get; set; }
+        public DateTime Date { get; set; }
+        public string Status { get; set; }
+    }
+
+    public class UpdateInquiryStatusDto
+    {
+        public string Status { get; set; }
+    }
 }
+

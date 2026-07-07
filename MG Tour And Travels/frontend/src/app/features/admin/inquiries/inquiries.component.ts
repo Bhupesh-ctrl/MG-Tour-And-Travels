@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ToastService } from '../../../core/services/toast.service';
+import { ApiService } from '../../../core/services/api.service';
 
 @Component({
   selector: 'app-inquiries',
@@ -9,9 +10,6 @@ import { ToastService } from '../../../core/services/toast.service';
         <div>
           <h1 class="text-gradient">Customer Leads & Inquiries</h1>
           <p style="color: var(--text-secondary);">Manage general inquiries and outstation booking requests</p>
-        </div>
-        <div style="display:flex; gap:0.75rem;">
-          <button class="btn btn-secondary" (click)="resetMockData()">Reset Demo Data</button>
         </div>
       </div>
 
@@ -232,7 +230,10 @@ export class InquiriesComponent implements OnInit {
   filteredGeneral: any[] = [];
   filteredOutstation: any[] = [];
 
-  constructor(private toast: ToastService) {}
+  constructor(
+    private toast: ToastService,
+    private apiService: ApiService
+  ) {}
 
   ngOnInit() {
     this.loadData();
@@ -246,79 +247,27 @@ export class InquiriesComponent implements OnInit {
   }
 
   loadData() {
-    // Load general callback requests
-    let general = localStorage.getItem('general_inquiries');
-    if (!general) {
-      // Seed initial mock inquiries
-      const mockGeneral = [
-        {
-          id: 1,
-          name: 'Amit Kumar',
-          phone: '9810981098',
-          carPreference: 'Swift Dzire',
-          notes: 'Looking for a daily corporate pick and drop fleet from Noida to Gurugram. Please send details.',
-          date: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // 1 day ago
-          status: 'New'
-        },
-        {
-          id: 2,
-          name: 'Sunita Sharma',
-          phone: '8800880088',
-          carPreference: 'Hyundai Aura',
-          notes: 'Airport drop transfer from Sector 56 Gurugram tomorrow early morning at 6:00 AM.',
-          date: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(), // 5 hours ago
-          status: 'New'
-        }
-      ];
-      localStorage.setItem('general_inquiries', JSON.stringify(mockGeneral));
-      this.generalInquiries = mockGeneral;
-    } else {
-      this.generalInquiries = JSON.parse(general);
-    }
+    this.apiService.getGeneralInquiries().subscribe({
+      next: (res) => {
+        this.generalInquiries = res.data || [];
+        this.filterData();
+      },
+      error: (err) => {
+        console.error('Error loading general inquiries', err);
+        this.toast.error('Failed to load general inquiries.');
+      }
+    });
 
-    // Load outstation requests
-    let outstation = localStorage.getItem('outstation_queries');
-    if (!outstation) {
-      // Seed initial mock outstation inquiries
-      const mockOutstation = [
-        {
-          id: 1,
-          name: 'Rajesh Gupta',
-          phone: '9911223344',
-          tripType: 'Round Trip',
-          pickupLocation: 'Delhi Airport T3',
-          dropLocation: 'Hotel Hilton, Jaipur, Rajasthan',
-          checkinDateTime: '2026-06-15T10:00',
-          checkoutDateTime: '2026-06-18T18:00',
-          passengerCount: 3,
-          carPreference: 'Any Sedan',
-          remarks: 'Requires driver fluent in English, trunk space for 3 suitcases.',
-          date: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(), // 2 days ago
-          status: 'New'
-        },
-        {
-          id: 2,
-          name: 'Vikram Singh',
-          phone: '9560123456',
-          tripType: 'One Way',
-          pickupLocation: 'DLF Cyber City, Phase 3 Gurugram',
-          dropLocation: 'Taj Mahal East Gate, Agra, UP',
-          checkinDateTime: '2026-06-20T07:00',
-          checkoutDateTime: '',
-          passengerCount: 4,
-          carPreference: 'Swift Dzire',
-          remarks: 'No return, drops only.',
-          date: new Date(Date.now() - 1000 * 60 * 60 * 12).toISOString(), // 12 hours ago
-          status: 'Contacted'
-        }
-      ];
-      localStorage.setItem('outstation_queries', JSON.stringify(mockOutstation));
-      this.outstationQueries = mockOutstation;
-    } else {
-      this.outstationQueries = JSON.parse(outstation);
-    }
-
-    this.filterData();
+    this.apiService.getOutstationInquiries().subscribe({
+      next: (res) => {
+        this.outstationQueries = res.data || [];
+        this.filterData();
+      },
+      error: (err) => {
+        console.error('Error loading outstation inquiries', err);
+        this.toast.error('Failed to load outstation inquiries.');
+      }
+    });
   }
 
   filterData() {
@@ -355,48 +304,58 @@ export class InquiriesComponent implements OnInit {
   }
 
   updateGeneralStatus(id: number, newStatus: string) {
-    const idx = this.generalInquiries.findIndex(i => i.id === id);
-    if (idx !== -1) {
-      this.generalInquiries[idx].status = newStatus;
-      localStorage.setItem('general_inquiries', JSON.stringify(this.generalInquiries));
-      this.filterData();
-      this.toast.info(`Inquiry marked as ${newStatus}.`);
-    }
+    this.apiService.updateGeneralInquiryStatus(id, newStatus).subscribe({
+      next: () => {
+        this.toast.info(`Inquiry marked as ${newStatus}.`);
+        this.loadData();
+      },
+      error: (err) => {
+        console.error('Error updating status', err);
+        this.toast.error('Failed to update status.');
+      }
+    });
   }
 
   updateOutstationStatus(id: number, newStatus: string) {
-    const idx = this.outstationQueries.findIndex(i => i.id === id);
-    if (idx !== -1) {
-      this.outstationQueries[idx].status = newStatus;
-      localStorage.setItem('outstation_queries', JSON.stringify(this.outstationQueries));
-      this.filterData();
-      this.toast.info(`Request marked as ${newStatus}.`);
-    }
+    this.apiService.updateOutstationInquiryStatus(id, newStatus).subscribe({
+      next: () => {
+        this.toast.info(`Request marked as ${newStatus}.`);
+        this.loadData();
+      },
+      error: (err) => {
+        console.error('Error updating status', err);
+        this.toast.error('Failed to update status.');
+      }
+    });
   }
 
   deleteGeneral(id: number) {
     if (confirm('Are you sure you want to delete this general lead?')) {
-      this.generalInquiries = this.generalInquiries.filter(i => i.id !== id);
-      localStorage.setItem('general_inquiries', JSON.stringify(this.generalInquiries));
-      this.filterData();
-      this.toast.success('Inquiry deleted.');
+      this.apiService.deleteGeneralInquiry(id).subscribe({
+        next: () => {
+          this.toast.success('Inquiry deleted.');
+          this.loadData();
+        },
+        error: (err) => {
+          console.error('Error deleting inquiry', err);
+          this.toast.error('Failed to delete inquiry.');
+        }
+      });
     }
   }
 
   deleteOutstation(id: number) {
     if (confirm('Are you sure you want to delete this outstation request?')) {
-      this.outstationQueries = this.outstationQueries.filter(i => i.id !== id);
-      localStorage.setItem('outstation_queries', JSON.stringify(this.outstationQueries));
-      this.filterData();
-      this.toast.success('Outstation request deleted.');
-    }
-  }
-
-  resetMockData() {
-    if (confirm('Reset to default mock lead list? This will remove custom submissions.')) {
-      localStorage.removeItem('general_inquiries');
-      localStorage.removeItem('outstation_queries');
-      this.loadData();
+      this.apiService.deleteOutstationInquiry(id).subscribe({
+        next: () => {
+          this.toast.success('Outstation request deleted.');
+          this.loadData();
+        },
+        error: (err) => {
+          console.error('Error deleting request', err);
+          this.toast.error('Failed to delete request.');
+        }
+      });
     }
   }
 }

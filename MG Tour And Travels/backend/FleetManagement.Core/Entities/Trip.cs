@@ -29,5 +29,8 @@ namespace FleetManagement.Core.Entities
         public decimal? FareAmount { get; set; }
         public decimal? TollAmount { get; set; }
         public string? Notes { get; set; }
+        public bool IsGuardRoute { get; set; } = false;
+        public string RouteType { get; set; } = "Gurgaon";
+        public bool IsTollRoute { get; set; } = false;
     }
 }

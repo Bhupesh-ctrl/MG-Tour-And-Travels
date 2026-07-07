@@ -35,6 +35,10 @@ namespace FleetManagement.Core.Enums
         Maintenance,
         Toll,
         Insurance,
+        Challan,
+        Salary,
+        Permit,
+        Accessories,
         Other
     }
 

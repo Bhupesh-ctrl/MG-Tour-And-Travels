@@ -22,6 +22,12 @@ import { AuthService } from '../../core/services/auth.service';
           {{ errorMsg }}
         </div>
 
+        <!-- Waking Up Alert -->
+        <div *ngIf="wakingUpMsg && !errorMsg" class="badge badge-warning error-alert" style="white-space: normal; display: flex; flex-direction: column; text-transform: none; letter-spacing: normal; line-height: 1.4; text-align: center; gap: 4px;">
+          <strong>Server waking up...</strong>
+          <span style="font-size: 0.8rem; font-weight: normal; opacity: 0.9;">{{ wakingUpMsg }}</span>
+        </div>
+
         <!-- Password Form (For both Driver & Admin) -->
         <div *ngIf="loginMethod === 'password'" class="form-container">
           <div class="form-group">
@@ -166,6 +172,7 @@ export class LoginComponent implements OnInit {
   loginMethod: 'password' | 'signup' = 'password';
   loading = false;
   errorMsg = '';
+  wakingUpMsg = '';
   passwordForm = {
     username: '',
     password: ''
@@ -215,6 +222,13 @@ export class LoginComponent implements OnInit {
     }
     this.loading = true;
     this.errorMsg = '';
+    this.wakingUpMsg = '';
+
+    const slowRequestTimeout = setTimeout(() => {
+      if (this.loading) {
+        this.wakingUpMsg = 'The server has been inactive and is starting up. This might take 10-20 seconds. Retrying automatically...';
+      }
+    }, 2500);
 
     const login$ = this.activeTab === 'admin'
       ? this.authService.loginAdmin(this.passwordForm)
@@ -222,7 +236,9 @@ export class LoginComponent implements OnInit {
 
     login$.subscribe({
       next: (res) => {
+        clearTimeout(slowRequestTimeout);
         this.loading = false;
+        this.wakingUpMsg = '';
         if (res.success) {
           const userRole = res.data.role;
 
@@ -248,8 +264,10 @@ export class LoginComponent implements OnInit {
         }
       },
       error: (err) => {
+        clearTimeout(slowRequestTimeout);
         this.loading = false;
-        this.errorMsg = err.error?.message || 'Server connection error.';
+        this.wakingUpMsg = '';
+        this.errorMsg = err.error?.message || 'Server connection error. Please try again.';
       }
     });
   }
@@ -261,6 +279,13 @@ export class LoginComponent implements OnInit {
     }
     this.loading = true;
     this.errorMsg = '';
+    this.wakingUpMsg = '';
+
+    const slowRequestTimeout = setTimeout(() => {
+      if (this.loading) {
+        this.wakingUpMsg = 'The server has been inactive and is starting up. This might take 10-20 seconds. Retrying automatically...';
+      }
+    }, 2500);
 
     // Pass empty string for OTP since the backend has bypassed OTP verification
     this.authService.signupDriver(
@@ -269,7 +294,9 @@ export class LoginComponent implements OnInit {
       this.signupForm.password
     ).subscribe({
       next: (res) => {
+        clearTimeout(slowRequestTimeout);
         this.loading = false;
+        this.wakingUpMsg = '';
         if (res.success) {
           this.router.navigate(['/driver/dashboard']);
         } else {
@@ -277,7 +304,9 @@ export class LoginComponent implements OnInit {
         }
       },
       error: (err) => {
+        clearTimeout(slowRequestTimeout);
         this.loading = false;
+        this.wakingUpMsg = '';
         this.errorMsg = err.error?.message || 'Invalid phone number or password error.';
       }
     });

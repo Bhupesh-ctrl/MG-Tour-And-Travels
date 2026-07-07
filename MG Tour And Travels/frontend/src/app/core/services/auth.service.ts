@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, BehaviorSubject, timer, throwError } from 'rxjs';
+import { map, retry } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -33,8 +33,27 @@ export class AuthService {
     return sessionStorage.getItem('token');
   }
 
+  private retryTransient<T>() {
+    return retry<T>({
+      count: 3,
+      delay: (error: any, retryCount: number) => {
+        const isTransient = error.status === 0 || 
+                            error.status === 408 || 
+                            error.status === 502 || 
+                            error.status === 503 || 
+                            error.status === 504;
+        if (isTransient) {
+          console.warn(`Transient connection error (${error.status}). Retrying... (Attempt ${retryCount}/3)`);
+          return timer(3000);
+        }
+        return throwError(() => error);
+      }
+    });
+  }
+
   loginAdmin(dto: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/admin/login`, dto).pipe(
+      this.retryTransient(),
       map(res => {
         if (res && res.success && res.data.token) {
           sessionStorage.setItem('token', res.data.token);
@@ -48,6 +67,7 @@ export class AuthService {
 
   loginGeneral(dto: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/login`, dto).pipe(
+      this.retryTransient(),
       map(res => {
         if (res && res.success && res.data.token) {
           sessionStorage.setItem('token', res.data.token);
@@ -60,11 +80,14 @@ export class AuthService {
   }
 
   requestOtp(phone: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/otp/request`, { phone });
+    return this.http.post<any>(`${this.apiUrl}/otp/request`, { phone }).pipe(
+      this.retryTransient()
+    );
   }
 
   verifyOtp(phone: string, otpCode: string): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/otp/verify`, { phone, otpCode }).pipe(
+      this.retryTransient(),
       map(res => {
         if (res && res.success && res.data.token) {
           sessionStorage.setItem('token', res.data.token);
@@ -78,6 +101,7 @@ export class AuthService {
 
   signupDriver(phone: string, otpCode: string, password: string): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/driver/signup`, { phone, otpCode, password }).pipe(
+      this.retryTransient(),
       map(res => {
         if (res && res.success && res.data.token) {
           sessionStorage.setItem('token', res.data.token);

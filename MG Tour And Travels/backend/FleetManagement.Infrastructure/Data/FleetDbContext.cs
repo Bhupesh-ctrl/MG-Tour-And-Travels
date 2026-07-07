@@ -25,6 +25,8 @@ namespace FleetManagement.Infrastructure.Data
         public DbSet<Target> Targets { get; set; }
         public DbSet<Document> Documents { get; set; }
         public DbSet<AuditLog> AuditLogs { get; set; }
+        public DbSet<GeneralInquiry> GeneralInquiries { get; set; }
+        public DbSet<OutstationInquiry> OutstationInquiries { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -39,6 +41,8 @@ namespace FleetManagement.Infrastructure.Data
             modelBuilder.Entity<Earning>().HasQueryFilter(er => !er.IsDeleted);
             modelBuilder.Entity<Target>().HasQueryFilter(tg => !tg.IsDeleted);
             modelBuilder.Entity<Document>().HasQueryFilter(doc => !doc.IsDeleted);
+            modelBuilder.Entity<GeneralInquiry>().HasQueryFilter(gi => !gi.IsDeleted);
+            modelBuilder.Entity<OutstationInquiry>().HasQueryFilter(oi => !oi.IsDeleted);
 
             // Unique constraints
             modelBuilder.Entity<User>().HasIndex(u => u.Username).IsUnique().HasFilter("[Username] IS NOT NULL");

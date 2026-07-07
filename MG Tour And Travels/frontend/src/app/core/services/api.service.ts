@@ -210,4 +210,38 @@ export class ApiService {
   deleteAdmin(id: number): Observable<any> {
     return this.http.delete<any>(`${this.baseUrl}/admins/${id}`);
   }
+
+  // Inquiries API
+  getGeneralInquiries(): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/inquiries/general`);
+  }
+
+  getOutstationInquiries(): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/inquiries/outstation`);
+  }
+
+  createGeneralInquiry(inquiry: any): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/inquiries/general`, inquiry);
+  }
+
+  createOutstationInquiry(inquiry: any): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/inquiries/outstation`, inquiry);
+  }
+
+  updateGeneralInquiryStatus(id: number, status: string): Observable<any> {
+    return this.http.put<any>(`${this.baseUrl}/inquiries/general/${id}/status`, { status });
+  }
+
+  updateOutstationInquiryStatus(id: number, status: string): Observable<any> {
+    return this.http.put<any>(`${this.baseUrl}/inquiries/outstation/${id}/status`, { status });
+  }
+
+  deleteGeneralInquiry(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.baseUrl}/inquiries/general/${id}`);
+  }
+
+  deleteOutstationInquiry(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.baseUrl}/inquiries/outstation/${id}`);
+  }
 }
+

@@ -61,6 +61,10 @@ import { ToastService } from '../../../core/services/toast.service';
                   <option value="Maintenance">Maintenance</option>
                   <option value="Toll">Toll</option>
                   <option value="Insurance">Insurance</option>
+                  <option value="Challan">Challan</option>
+                  <option value="Salary">Salary</option>
+                  <option value="Permit">Permit</option>
+                  <option value="Accessories">Accessories</option>
                   <option value="Other">Other</option>
                 </select>
               </td>
@@ -91,7 +95,7 @@ import { ToastService } from '../../../core/services/toast.service';
             <tr *ngFor="let exp of expenses">
               <td>{{ exp.expenseDate | date:'mediumDate' }}</td>
               <td><strong>{{ exp.driverName }}</strong></td>
-              <td><code>{{ exp.vehicleNumber || 'N/A' }}</code></td>
+              <td><code>{{ exp.vehicleNumber || 'General' }}</code></td>
               <td>{{ getCategoryLabel(exp.category) }}</td>
               <td style="color: var(--text-primary); font-weight: 700;">{{ exp.amount | currency }}</td>
               <td>{{ exp.description }}</td>
@@ -170,7 +174,11 @@ import { ToastService } from '../../../core/services/toast.service';
                 <option [value]="1">Maintenance</option>
                 <option [value]="2">Toll Charges</option>
                 <option [value]="3">Insurance</option>
-                <option [value]="4">Other</option>
+                <option [value]="4">Challan / Fine</option>
+                <option [value]="5">Salary</option>
+                <option [value]="6">Permit / RTO / Tax</option>
+                <option [value]="7">Accessories</option>
+                <option [value]="8">Other</option>
               </select>
             </div>
             <div class="form-group">
@@ -333,7 +341,11 @@ export class ExpenseManagementComponent implements OnInit {
       case 1: return 'Maintenance';
       case 2: return 'Toll';
       case 3: return 'Insurance';
-      case 4: return 'Other';
+      case 4: return 'Challan';
+      case 5: return 'Salary';
+      case 6: return 'Permit';
+      case 7: return 'Accessories';
+      case 8: return 'Other';
       default: return 'Unknown';
     }
   }
@@ -476,11 +488,6 @@ export class ExpenseManagementComponent implements OnInit {
         }
       });
     } else {
-      if (!this.expenseForm.cabId) {
-        this.modalError = 'Please select a cab.';
-        this.loading = false;
-        return;
-      }
       this.apiService.createExpense(payload).subscribe({
         next: (res) => {
           this.loading = false;

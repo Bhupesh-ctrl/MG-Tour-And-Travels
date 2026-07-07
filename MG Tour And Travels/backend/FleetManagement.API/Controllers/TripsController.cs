@@ -106,7 +106,10 @@ namespace FleetManagement.API.Controllers
                     FuelConsumed = t.FuelConsumed,
                     FareAmount = t.FareAmount,
                     TollAmount = t.TollAmount,
-                    Notes = t.Notes
+                    Notes = t.Notes,
+                    IsGuardRoute = t.IsGuardRoute,
+                    RouteType = t.RouteType,
+                    IsTollRoute = t.IsTollRoute
                 })
                 .ToListAsync();
 
@@ -168,7 +171,10 @@ namespace FleetManagement.API.Controllers
                     FuelConsumed = trip.FuelConsumed,
                     FareAmount = trip.FareAmount,
                     TollAmount = trip.TollAmount,
-                    Notes = trip.Notes
+                    Notes = trip.Notes,
+                    IsGuardRoute = trip.IsGuardRoute,
+                    RouteType = trip.RouteType,
+                    IsTollRoute = trip.IsTollRoute
                 }
             });
         }
@@ -229,7 +235,10 @@ namespace FleetManagement.API.Controllers
                 PickupOrDrop = dto.PickupOrDrop,
                 Status = TripStatus.Active,
                 Notes = dto.Notes,
-                IsActive = true
+                IsActive = true,
+                IsGuardRoute = dto.IsGuardRoute,
+                RouteType = dto.RouteType,
+                IsTollRoute = dto.IsTollRoute
             };
 
             _context.Trips.Add(trip);
@@ -469,7 +478,10 @@ namespace FleetManagement.API.Controllers
                 FuelConsumed = 0m,
                 FareAmount = 0m,
                 TollAmount = 0m,
-                IsActive = true
+                IsActive = true,
+                IsGuardRoute = dto.IsGuardRoute,
+                RouteType = dto.RouteType,
+                IsTollRoute = dto.IsTollRoute
             };
 
             using var transaction = await _context.Database.BeginTransactionAsync();
@@ -574,7 +586,10 @@ namespace FleetManagement.API.Controllers
                 trip.FareAmount = dto.FareAmount;
                 trip.TollAmount = dto.TollAmount;
                 trip.Notes = dto.Notes;
-
+                trip.IsGuardRoute = dto.IsGuardRoute;
+                trip.RouteType = dto.RouteType;
+                trip.IsTollRoute = dto.IsTollRoute;
+ 
                 _context.Trips.Update(trip);
                 await _context.SaveChangesAsync();
 
